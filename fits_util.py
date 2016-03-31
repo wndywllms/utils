@@ -34,7 +34,8 @@ Returns
     t = pf.open(fitsname)
     data = t[1].data
     t.close()
-    t = data.view(np.recarray)
+    #t = data.view(np.recarray)
+    t = data
     
     if verbose > 2:
         print data.dtype.names
@@ -45,6 +46,8 @@ Returns
         fi = t.dtype.names.index(fields[0])
         rec = np.recarray((len(t),),formats=t.dtype[fi],names=fields[0])
         rec[fields[0]] = t[fields[0]]
+        
+        a = rec
         
         # copy the other columns
         for fi, name in enumerate(fields[1:]):
@@ -80,11 +83,12 @@ Returns
     else:
         a = t
             
-    if verbose > 2:
-        f = 1024.*1024 # for MB
-        print '              memory status: mem %.2f, resident %.2f, stacksize %.2f' %(memory()/f, resident()/f, stacksize()/f)
+    #if verbose > 2:
+        #f = 1024.*1024 # for MB
+        #print '              memory status: mem %.2f, resident %.2f, stacksize %.2f' %(memory()/f, resident()/f, stacksize()/f)
     
-    return a.view(np.recarray)
+    return a
+    #return a.view(np.recarray)
     
 def append_field(rec, name, rec2):
   '''Append a field (column) to a record array
