@@ -4,7 +4,8 @@
 # fits_util.py : routines for reading and handling FITS tables into python
 #                record arrays
 
-import pyfits as pf
+#import pyfits as pf
+import astropy.io.fits as pf
 import numpy as np
 
 def load_fits(fitsname, fields=[], verbose=0):
