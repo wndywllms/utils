@@ -87,8 +87,8 @@ Returns
         #f = 1024.*1024 # for MB
         #print '              memory status: mem %.2f, resident %.2f, stacksize %.2f' %(memory()/f, resident()/f, stacksize()/f)
     
-    return a
-    #return a.view(np.recarray)
+    #return a
+    return a.view(np.recarray)
     
 def append_field(rec, name, rec2):
   '''Append a field (column) to a record array
@@ -127,6 +127,7 @@ a : recarray
 
   a[name]=rec2
 
+  #return a
   return a.view(np.recarray)
   
 def append_record(rec, name, rec2):
