@@ -90,22 +90,38 @@ def ra_to_str(dra, ndec=2,delim=':'):
         dd += 1
     sra = '%02d%s%02d%s%05.2f' %(dd,delim,dm,delim,dsec)  
     return sra
+
 def dec_to_str(ddec,ndec=1,delim=':'):
     '''
     converts a single decimal degrees dec to dd:mm:ss.s
     '''
-    dd = math.floor(ddec)
-    dfrac = ddec - dd
-    dmins = dfrac*60.
-    dm = math.floor(dmins)
-    dsec = (dmins-dm)*60.
-    if round(dsec, ndec) == 60.0:
-        dsec = 0.
-        dm += 1
-    if dm == 60.:
-        dm = 0.
-        dd += 1
-    sdec = '%02d%s%02d%s%04.1f' %(dd,delim,dm,delim,dsec)
+    if ddec  >=0 :
+        dd = math.floor(ddec)
+        dfrac = ddec - dd
+        dmins = dfrac*60.
+        dm = math.floor(dmins)
+        dsec = (dmins-dm)*60.
+        if round(dsec, ndec) == 60.0:
+            dsec = 0.
+            dm += 1
+        if dm == 60.:
+            dm = 0.
+            dd += 1
+        sdec = '%02d%s%02d%s%04.1f' %(dd,delim,dm,delim,dsec)
+    else:
+        ddec = abs(ddec)
+        dd = math.floor(ddec)
+        dfrac = ddec - dd
+        dmins = dfrac*60.
+        dm = math.floor(dmins)
+        dsec = (dmins-dm)*60.
+        if round(dsec, ndec) == 60.0:
+            dsec = 0.
+            dm += 1
+        if dm == 60.:
+            dm = 0.
+            dd += 1
+        sdec = '-%02d%s%02d%s%04.1f' %(dd,delim,dm,delim,dsec)
     return sdec
     
 def match_celestial (ra1, dec1, ra2, dec2, radius, verbose=1):
@@ -163,6 +179,13 @@ def coordinates_to_name(ra,dec,mode='truncate', nsigra=3, nsigdec=2, prefix='J')
         frs = int(np.round(frs))
     
     
+    if dec/abs(dec) > 0:
+        decsign = '+'
+    else:
+        decsign = '-'
+        
+    dec = abs(dec)
+        
     ddd = dec  # decimal degrees
     dd = int(math.floor(ddd))   # integer decimal hrs
     dfdd = ddd - dd  # fractional decimal hrs
@@ -181,13 +204,11 @@ def coordinates_to_name(ra,dec,mode='truncate', nsigra=3, nsigdec=2, prefix='J')
     
     
     
-    if dec/abs(dec) > 0:
-        decsign = '+'
-    else:
-        decsign = '-'
         
-
-    sname = '{prefix}{rh:02d}{rm:02d}{rs:02d}.{frs:0{nsigra}d}{dsign:1}{dd:02d}{dm:02d}{ds:02d}.{fds:0{nsigdec}d}'.format(prefix=prefix, rh=rh, rm=rm, rs=rs, frs=frs, nsigra=nsigra, dsign=decsign, dd=dd, dm=dm, ds=ds, fds=fds, nsigdec=nsigdec)
+    if  nsigdec>0:
+        sname = '{prefix}{rh:02d}{rm:02d}{rs:02d}.{frs:0{nsigra}d}{dsign:1}{dd:02d}{dm:02d}{ds:02d}.{fds:0{nsigdec}d}'.format(prefix=prefix, rh=rh, rm=rm, rs=rs, frs=frs, nsigra=nsigra, dsign=decsign, dd=dd, dm=dm, ds=ds, fds=fds, nsigdec=nsigdec)
+    else:
+        sname = '{prefix}{rh:02d}{rm:02d}{rs:02d}.{frs:0{nsigra}d}{dsign:1}{dd:02d}{dm:02d}{ds:02d}'.format(prefix=prefix, rh=rh, rm=rm, rs=rs, frs=frs, nsigra=nsigra, dsign=decsign, dd=dd, dm=dm, ds=ds, fds=fds, nsigdec=nsigdec)
 
     #if mode == truncate:
     
