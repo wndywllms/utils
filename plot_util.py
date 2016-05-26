@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib as mpl
+#mpl.use('Agg')
 mpl.rc_file('/home/wwilliams/.config/matplotlib/matplotlibrc')  # <-- the file containing your settings
 import matplotlib.pyplot as plt
 
