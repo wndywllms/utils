@@ -118,7 +118,7 @@ def bandwidth_smearing(freq,resolution,delta_Theta):
 
     return delta_freq
 
-def bandwidth_smearing2(delta_freq,freq,resolution,delta_Theta):.
+def bandwidth_smearing2(delta_freq,freq,resolution,delta_Theta):
     #http://www.cv.nrao.edu/course/astr534/Interferometers1.html
     # Output and input units are equal 
     # Condition that delta_Theta * delta_freq << Freq * resolution
