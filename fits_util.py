@@ -15,7 +15,7 @@ shorthand to astropy.io.fits.writeto
     pf.writeto(*args, **kwargs)
     return
 
-def load_fits(fitsname, fields=[], verbose=0):
+def load_fits(fitsname, fields=[], hdu=0, verbose=0):
     '''load_fits : load table data from fits file
 Parameters
 ----------
@@ -38,7 +38,7 @@ Returns
         print 'loading data: %s' %(fitsname)
         
     # load fits and get data cast to recarray
-    t = pf.open(fitsname)
+    t = pf.open(fitsname, hdu=dhu)
     data = t[1].data
     t.close()
     #t = data.view(np.recarray)
