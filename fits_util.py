@@ -8,6 +8,13 @@
 import astropy.io.fits as pf
 import numpy as np
 
+def  writeto(*args, **kwargs):
+    '''
+shorthand to astropy.io.fits.writeto    
+    '''
+    pf.writeto(*args, **kwargs)
+    return
+
 def load_fits(fitsname, fields=[], verbose=0):
     '''load_fits : load table data from fits file
 Parameters
