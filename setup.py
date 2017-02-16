@@ -4,5 +4,5 @@ setup(author='Wendy L. Williams',
       url='https://github.com/wllwen007/utils',
       name='utils',
       version='1.0',
-      py_modules=['utils'],
+      packages=['utils'],
       )
