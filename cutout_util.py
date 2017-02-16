@@ -243,6 +243,32 @@ kwargs:
     os.system( 'fitscopy %s %s' %(inps,fitscut) )
     return
 
+def cutout_from_local_files2(fitscut, ra, dec, imsize, local_file_path="", local_file_list=""):
+    """
+args:
+    fitscut - name of cutout
+    ra      - degrees
+    dec     - degrees
+    imsize  - size of cutout in degrees
+kwargs:
+    local_file     - name of fits file from which to make cutout
+    """
+
+
+    import astropy.coordinates as ac
+    from astropy.table import Table
+    
+    t = Table.read(local_file_list, format='ascii')
+    C = ac.SkyCoord(ra,dec,unit='deg')
+    idx, sep, dist =  ac.match_coordinates_sky(C, ac.SkyCoord(t['ra'],t['dec'],unit='deg'))
+    fitsname = t['name'][idx]
+    
+    print 'nearest fitsimage is',fitsname
+    
+    cutout_from_local_file(fitscut, ra, dec, imsize, local_file=local_file_path+'/'+fitsname)
+    
+    return
+
 
 def cutout_from_local_files(fitscut, ra, dec, imsize, local_file_path="", local_file_list=""):
     """
@@ -332,6 +358,33 @@ kwargs:
     if os.path.isfile(fitscut): os.system('rm '+fitscut)
     os.system( 'fitscopy %s %s' %(inps,fitscut) )
     return
+
+
+def download_panstarrs(ra,dec,f='i',s=1200):
+    wgeturl = "http://ps1images.stsci.edu/cgi-bin/ps1cutouts?pos={ra:f}+{dec:f}&filter=color&filter={f:s}&filetypes=stack&auxiliary=data&size={s:d}&output_size=0&verbose=0&autoscale=99.500000&catlist=".format(ra=ra,dec=dec,f=f,s=s)
+    cmd = ['wget', wgeturl, '-O', 'ttt']
+    p = sub.Popen(cmd)
+    p.wait()
+    with open('ttt','r') as ff:
+        lines = ff.readlines()
+    for line in lines:
+        if 'Download' in line:
+            break
+    i = line.find('Download FITS cutout')
+    
+    line = line[i:]
+    i = line.find('http:')
+    line = line[i:]
+    i = line.find('">')
+    line = line[:i]
+    fits = line
+    print fits
+    fitsname = 'panstars_{f:s}_{ra:f}+{dec:f}.fits'.format(name=fits,f=f,ra=ra,dec=dec)
+    cmd = ['wget',fits, '-O', fitsname ]
+    p=sub.Popen(cmd)
+    p.wait()
+    os.system('rm -rf ttt')
+    return fitsname
 
 def cutout_from_server(fitscut, url=""):
     """ get a fits cutout from a server
@@ -471,6 +524,26 @@ returns
     result = cutout_from_server(fitscut, url=url)
     return result
 
+
+#def get_nvss_cutout(fitscut, ra, dec, imsize):
+    #""" get a fits cutout from NVSS server
+#args:
+    #fitscut - name of cutout
+    #ra      - degrees
+    #dec     - degrees
+    #imsize  - size of cutout in degrees
+#returns
+    #result  - success?
+    #"""
+    #sra = ra_to_str( ra )
+    #sdec = dec_to_str( dec )
+    #imsize = imsize * 60.
+    
+    #url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
+    
+    #print url
+    #result = cutout_from_server(fitscut, url=url)
+    #return result
 
 def get_NDWFS_cutout_MAGES(fitsname, ra,dec, imsize = 2., band='I', verbose=0):
     
