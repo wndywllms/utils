@@ -305,7 +305,7 @@ def hist2d(ax, xdat, ydat, xyrange, bins, thresh=2, cmap=plt.cm.Greys, log=False
 
 
 def make_ax3():
-    paper_single(TW=9, AR=0.9)
+    paper_single(TW=8, AR=0.9)
     f = plt.figure()
     
     from matplotlib.ticker import NullFormatter, MaxNLocator
@@ -334,8 +334,8 @@ def make_ax3():
     axy.yaxis.set_major_formatter(nullfmt)
     
     
-    axy.xaxis.set_major_locator(MaxNLocator(4))
-    axx.yaxis.set_major_locator(MaxNLocator(4))
+    axy.xaxis.set_major_locator(MaxNLocator(3))
+    axx.yaxis.set_major_locator(MaxNLocator(3))
     
     return f,ax,axx,axy
 
@@ -357,6 +357,7 @@ mylinestyles = ['-', '-','-', '-' ,'-','-','-']
 
 #sample_colours = ['#ff0000', '#ff0e00', '#ff1b00', '#ff2900', '#ff3700', '#ff4500', '#ff5200', '#ff6000', '#ff6e00', '#ff7c00', '#ff8a00', '#ff9700' ', ''#ffa500']
 #sample_colours = ['#ff0000', '#ff5200', '#ffa500']
+erg_colours = ['c','m']
 sample_colours = ['#fecc5c','#fd8d3c', '#e31a1c','darkred']
 sample_markers = ['s', '^', 'o']
 sample_colours = ['#fecc5c','#fd8d3c', '#e31a1c','darkred']
