@@ -393,6 +393,11 @@ def download_panstarrs(fitsname,ra,dec,f='i',s=1200):
     print ' '.join(cmd)
     p=sub.Popen(cmd)
     p.wait()
+    try:
+        pf.open(fitsname)
+    except:
+        print 'error downloading panstarrs cutout'
+        return -1
     os.system('rm -rf ttt')
     return fitsname
 
