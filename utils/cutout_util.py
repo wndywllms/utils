@@ -363,6 +363,7 @@ kwargs:
 def download_panstarrs(ra,dec,f='i',s=1200):
     wgeturl = "http://ps1images.stsci.edu/cgi-bin/ps1cutouts?pos={ra:f}+{dec:f}&filter=color&filter={f:s}&filetypes=stack&auxiliary=data&size={s:d}&output_size=0&verbose=0&autoscale=99.500000&catlist=".format(ra=ra,dec=dec,f=f,s=s)
     cmd = ['wget', wgeturl, '-O', 'ttt']
+    print ' '.join(cmd)
     p = sub.Popen(cmd)
     p.wait()
     with open('ttt','r') as ff:
@@ -381,6 +382,7 @@ def download_panstarrs(ra,dec,f='i',s=1200):
     print fits
     fitsname = 'panstars_{f:s}_{ra:f}+{dec:f}.fits'.format(name=fits,f=f,ra=ra,dec=dec)
     cmd = ['wget',fits, '-O', fitsname ]
+    print ' '.join(cmd)
     p=sub.Popen(cmd)
     p.wait()
     os.system('rm -rf ttt')
