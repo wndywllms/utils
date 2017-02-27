@@ -373,13 +373,21 @@ def download_panstarrs(ra,dec,f='i',s=1200):
             break
     i = line.find('Download FITS cutout')
     
-    line = line[i:]
-    i = line.find('http:')
-    line = line[i:]
-    i = line.find('">')
-    line = line[:i]
-    fits = line
-    print fits
+    line1 = line[i:]
+    i = line1.find('http:')
+    if i == -1:
+        i = line1.find('href="//')
+        line2 = line1[i+8:]
+        i = line2.find('">')
+        line3 = line2[:i]
+        fits = line3
+        print fits
+    else:
+        line2 = line1[i:]
+        i = line2.find('">')
+        line3 = line2[:i]
+        fits = line3
+        print fits
     fitsname = 'panstars_{f:s}_{ra:f}+{dec:f}.fits'.format(name=fits,f=f,ra=ra,dec=dec)
     cmd = ['wget',fits, '-O', fitsname ]
     print ' '.join(cmd)
