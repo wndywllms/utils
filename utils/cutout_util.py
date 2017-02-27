@@ -360,7 +360,12 @@ kwargs:
     return
 
 
-def download_panstarrs(fitsname,ra,dec,f='i',s=1200):
+def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08):
+    '''
+    imsize in deg
+    '''
+    s = int(imsize*3600.*4)  #arcsec to pix seems to be 4pix=1arcsec
+    
     wgeturl = "http://ps1images.stsci.edu/cgi-bin/ps1cutouts?pos={ra:f}+{dec:f}&filter=color&filter={f:s}&filetypes=stack&auxiliary=data&size={s:d}&output_size=0&verbose=0&autoscale=99.500000&catlist=".format(ra=ra,dec=dec,f=f,s=s)
     cmd = ['wget', wgeturl, '-O', 'ttt']
     print ' '.join(cmd)
