@@ -192,8 +192,8 @@ kwargs:
     # Convert pixel coordinates to world coordinates
     pixel = wcs.wcs_sky2pix(skycrd, 0)
 
-    x = pixel[0][0]
-    y = pixel[0][1]
+    x = np.floor(pixel[0][0])
+    y = np.floor(pixel[0][1])
     pixsize = abs(wcs.wcs.cdelt[0])
     N = imsize/pixsize
     #if VERBOSE > 2:
