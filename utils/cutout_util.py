@@ -190,7 +190,7 @@ kwargs:
     skycrd = np.array([[ra,dec,0,0]], np.float_)
 
     # Convert pixel coordinates to world coordinates
-    pixel = wcs.wcs_sky2pix(skycrd, 1)
+    pixel = wcs.wcs_sky2pix(skycrd, 0)
 
     x = pixel[0][0]
     y = pixel[0][1]
