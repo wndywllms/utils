@@ -340,6 +340,69 @@ def make_ax3():
     return f,ax,axx,axy
 
 
+def flatten(fitsin):
+    fh = fits.open(fitsin)
+    data = fh[0].data.squeeze() # drops the size-1 axes
+    header = fh[0].header
+    mywcs = wcs.WCS(header).celestial
+    new_header = mywcs.to_header()
+    new_fh = fits.PrimaryHDU(data=data, header=new_header)
+    new_fh.writeto(fitsin, clobber=True)
+    return
+
+def  get_noise(fitsfile, vm=False):
+    dat = fits.getdata(fitsfile)
+    if np.sum(np.isfinite(dat))==0:
+        return np.nan, np.nan, np.nan
+    mean, median, stddev = sigma_clipped_stats(dat, sigma=5, iters=10)
+    if not vm:
+        return mean, median, stddev
+    else:
+        vmax=np.median(dat[dat>(mean+5*stddev)])
+        return mean, median, stddev, vmax
+
+
+def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname):
+    
+    f = plt.figure()
+    #ax1 = f.add_subplot(121)
+    ##ax2 = f.add_subplot(122)
+    
+    
+    m1, m2, rms, vm = get_noise(opt_cutout, vm=True)
+    
+    ax0 = ap.FITSFigure(opt_cutout,figure=f,north=True)
+    ax0.show_colorscale(vmin=m1+1*rms, vmax=vm, stretch='log')
+
+
+    
+    radiomax=np.nanmax(fits.getdata(radio_cutout))
+    drlimit=2000
+    #print radiomax/drlimit,rms*2.0
+    minlevel=max([radiomax/drlimit,rms*2.0])
+    levels=minlevel*2.0**np.linspace(0,14,30)
+    ax0.show_contour(radio_cutout, levels=levels, colors='y')
+    
+
+    
+    ax0.hide_ax0is_labels()
+    ax0.hide_tick_labels()
+    
+    ax0.add_scalebar(1/60.)  # size in deg
+    ax0.scalebar.set_color('w')
+    ax0.scalebar.set_corner('top right')
+    ax0.scalebar.set_label("$1'$")  # length in degrees
+    ax0.scalebar.set_font(size='small')
+    ax0.ticks.hide()
+    
+    f.savefig(outname)
+    
+    plt.close()
+    
+
+
+    return
+
 
 def nanhist(x,**kwargs):
     
