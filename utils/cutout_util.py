@@ -166,7 +166,7 @@ def postage(fitsim,postfits,ra,dec,s=2./60, verbose=0):
 
 
 
-def cutout_from_local_file(fitscut, ra, dec, imsize, local_file=""):
+def cutout_from_local_file(fitscut, ra, dec, imsize, local_file="", clobber=False):
     """
 args:
     fitscut - name of cutout
@@ -178,6 +178,15 @@ kwargs:
     """
     import pyfits as pf
     import pywcs as pw
+    
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
+        
+    
     
     head = pf.getheader(local_file)
     
@@ -243,7 +252,7 @@ kwargs:
     os.system( 'fitscopy %s %s' %(inps,fitscut) )
     return
 
-def cutout_from_local_files2(fitscut, ra, dec, imsize, local_file_path="", local_file_list=""):
+def cutout_from_local_files2(fitscut, ra, dec, imsize, local_file_path="", local_file_list="", clobber=False):
     """
 args:
     fitscut - name of cutout
@@ -254,6 +263,12 @@ kwargs:
     local_file     - name of fits file from which to make cutout
     """
 
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
 
     import astropy.coordinates as ac
     from astropy.table import Table
@@ -270,7 +285,7 @@ kwargs:
     return
 
 
-def cutout_from_local_files(fitscut, ra, dec, imsize, local_file_path="", local_file_list=""):
+def cutout_from_local_files(fitscut, ra, dec, imsize, local_file_path="", local_file_list="", clobber=False):
     """
 args:
     fitscut - name of cutout
@@ -284,6 +299,12 @@ kwargs:
     import pywcs as pw
     
     
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
     
     imdat = np.genfromtxt(local_file_list, dtype='S15,f,f,f,f', names=['images','ramin','ramax','decmin','decmax'])
 
@@ -360,7 +381,15 @@ kwargs:
     return
 
 
-def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08):
+def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
+    
+    if os.file.exists(fitsname):
+        if clobber:
+            os.system('rm '+fitsname)
+        else:
+            print 'file exists and clobber is False: ',fitsname
+            return
+        
     '''
     imsize in deg
     '''
@@ -406,7 +435,7 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08):
     os.system('rm -rf ttt')
     return fitsname
 
-def cutout_from_server(fitscut, url=""):
+def cutout_from_server(fitscut, url="", clobber=False):
     """ get a fits cutout from a server
 args:
     fitscut - name of cutout
@@ -414,6 +443,14 @@ kwargs:
     url     - server url
     """
     import pyfits as pf
+    
+    
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
     
     if VERBOSE > 2:
         print "cutout from server %s" %(fitscut)
@@ -463,7 +500,7 @@ kwargs:
         return True
 
 
-def get_WSRT_cutout(fitscut, ra, dec, imsize):
+def get_WSRT_cutout(fitscut, ra, dec, imsize, clobber=False):
     """ get a fits cutout from WSRT server
 args:
     fitscut - name of cutout
@@ -474,6 +511,13 @@ returns
     result  - success?
     """
     
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
+    
     sra = ra_to_str( ra ).replace(':','+')
     sdec = dec_to_str( dec ).replace(':','+')
     imsize = imsize*60.  # in arcmin
@@ -483,7 +527,7 @@ returns
     result = cutout_from_server(fitscut, url=url)
     return result
     
-def get_NDWFS_cutout(fitscut, ra, dec, imsize, band="I"):
+def get_NDWFS_cutout(fitscut, ra, dec, imsize, band="I", clobber=False):
     """ get a fits cutout from NDWFS server
 args:
     fitscut - name of cutout
@@ -496,6 +540,13 @@ returns
     result  - success?
     """
     
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
+    
     print ra,dec
     sra = ra_to_str( ra )
     sdec = dec_to_str( dec )
@@ -506,7 +557,7 @@ returns
     result = cutout_from_server(fitscut, url=url)
     return result
 
-def get_SDWFS_cutout(fitscut, ra, dec, imsize, band="I1"):
+def get_SDWFS_cutout(fitscut, ra, dec, imsize, band="I1", clobber=False):
     """ get a fits cutout from SDWFS server
 args:
     fitscut - name of cutout
@@ -518,13 +569,20 @@ kwargs
 returns
     result  - success?
     """
+    
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
         
     url = "http://irsa.ipac.caltech.edu/cgi-bin/Subimage/nph-subimage?origfile=/irsadata/SPITZER/SDWFS//images/combined_epochs/{band}_bootes.v32.fits&ra={ra:f}&dec={dec:f}&xsize={imsize:f}".format(band=band, ra=ra, dec=dec, imsize=imsize)
     
     result = cutout_from_server(fitscut, url=url)
     return result
 
-def get_first_cutout(fitscut, ra, dec, imsize):
+def get_first_cutout(fitscut, ra, dec, imsize, clobber=False):
     """ get a fits cutout from FIRST server
 args:
     fitscut - name of cutout
@@ -534,6 +592,14 @@ args:
 returns
     result  - success?
     """
+    
+    if os.file.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print 'file exists and clobber is False: ',fitscut
+            return
+    
     sra = ra_to_str( ra )
     sdec = dec_to_str( dec )
     imsize = imsize * 60.
@@ -565,7 +631,14 @@ returns
     #result = cutout_from_server(fitscut, url=url)
     #return result
 
-def get_NDWFS_cutout_MAGES(fitsname, ra,dec, imsize = 2., band='I', verbose=0):
+def get_NDWFS_cutout_MAGES(fitsname, ra,dec, imsize = 2., band='I', verbose=0, clobber=False):
+    
+  if os.file.exists(fitsname):
+    if clobber:
+        os.system('rm '+fitsname)
+    else:
+        print 'file exists and clobber is False: ',fitsname
+        return
     
   print 'cutout %s' %(fitsname)
   #imsize in arcmin
