@@ -391,7 +391,7 @@ def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname):
     
 
     
-    ax0.hide_ax0is_labels()
+    ax0.hide_axis_labels()
     ax0.hide_tick_labels()
     
     ax0.add_scalebar(1/60.)  # size in deg
