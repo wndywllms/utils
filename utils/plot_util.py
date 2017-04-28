@@ -340,29 +340,35 @@ def make_ax3():
     return f,ax,axx,axy
 
 
-def flatten(fitsin):
-    fh = fits.open(fitsin)
-    data = fh[0].data.squeeze() # drops the size-1 axes
-    header = fh[0].header
-    mywcs = wcs.WCS(header).celestial
-    new_header = mywcs.to_header()
-    new_fh = fits.PrimaryHDU(data=data, header=new_header)
-    new_fh.writeto(fitsin, clobber=True)
-    return
-
-def  get_noise(fitsfile, vm=False):
-    dat = fits.getdata(fitsfile)
-    if np.sum(np.isfinite(dat))==0:
-        return np.nan, np.nan, np.nan
-    mean, median, stddev = sigma_clipped_stats(dat, sigma=5, iters=10)
-    if not vm:
-        return mean, median, stddev
-    else:
-        vmax=np.median(dat[dat>(mean+5*stddev)])
-        return mean, median, stddev, vmax
-
 
 def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname):
+    
+    import astropy.io.fits as fits
+    from astropy.stats import sigma_clipped_stats
+    import aplpy as ap
+    
+    def flatten(fitsin):
+        fh = fits.open(fitsin)
+        data = fh[0].data.squeeze() # drops the size-1 axes
+        header = fh[0].header
+        mywcs = wcs.WCS(header).celestial
+        new_header = mywcs.to_header()
+        new_fh = fits.PrimaryHDU(data=data, header=new_header)
+        new_fh.writeto(fitsin, clobber=True)
+        return
+
+    def  get_noise(fitsfile, vm=False):
+        dat = fits.getdata(fitsfile)
+        if np.sum(np.isfinite(dat))==0:
+            return np.nan, np.nan, np.nan
+        mean, median, stddev = sigma_clipped_stats(dat, sigma=5, iters=10)
+        if not vm:
+            return mean, median, stddev
+        else:
+            vmax=np.median(dat[dat>(mean+5*stddev)])
+            return mean, median, stddev, vmax
+
+    
     
     f = plt.figure()
     #ax1 = f.add_subplot(121)
