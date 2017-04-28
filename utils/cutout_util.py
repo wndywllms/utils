@@ -179,7 +179,7 @@ kwargs:
     import pyfits as pf
     import pywcs as pw
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -263,7 +263,7 @@ kwargs:
     local_file     - name of fits file from which to make cutout
     """
 
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -299,7 +299,7 @@ kwargs:
     import pywcs as pw
     
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -383,7 +383,7 @@ kwargs:
 
 def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
     
-    if os.file.exists(fitsname):
+    if os.path.exists(fitsname):
         if clobber:
             os.system('rm '+fitsname)
         else:
@@ -445,7 +445,7 @@ kwargs:
     import pyfits as pf
     
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -511,7 +511,7 @@ returns
     result  - success?
     """
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -540,7 +540,7 @@ returns
     result  - success?
     """
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -570,7 +570,7 @@ returns
     result  - success?
     """
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -593,7 +593,7 @@ returns
     result  - success?
     """
     
-    if os.file.exists(fitscut):
+    if os.path.exists(fitscut):
         if clobber:
             os.system('rm '+fitscut)
         else:
@@ -633,7 +633,7 @@ returns
 
 def get_NDWFS_cutout_MAGES(fitsname, ra,dec, imsize = 2., band='I', verbose=0, clobber=False):
     
-  if os.file.exists(fitsname):
+  if os.path.exists(fitsname):
     if clobber:
         os.system('rm '+fitsname)
     else:
