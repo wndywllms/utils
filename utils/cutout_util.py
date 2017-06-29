@@ -46,8 +46,6 @@ def plot_image(fits,ax, rms=np.nan, F=np.nan, cont=None, contcol='r', stretch='s
   
   
   dat = pf.getdata(fits)
-  #dat = np.ma.masked_where(dat<1.,dat).compressed()
-  #dat = np.ma.masked_where(dat>10000.,dat).compressed()
   mean = np.median(dat)
   sig = np.std(dat)
   for i in range(10):
@@ -87,18 +85,6 @@ def postage(fitsim,postfits,ra,dec,s=2./60, verbose=0):
     s        - size of cutout in degrees (default 2')
   '''
   
-  ##s in degrees
-  #tra = ra/15.
-  #dra = math.floor(tra)
-  #dramin = math.floor((tra - dra)*60.)
-  #drasec = ((tra - dra)*60. - math.floor((tra - dra)*60.))*60.
-  #sra = '%02i%02i%02i' %(dra,dramin,drasec)
-  #ddec = math.floor(dec)
-  #ddecmin = math.floor((dec - ddec)*60.)
-  #ddecsec = ((dec - ddec)*60. - math.floor((dec - ddec)*60.))*60.
-  #sdec = '%02i%02i' %(ddec,ddecmin)
-  #Src_name = 'J%s+%s' %(sra,sdec)
-
   head = pf.getheader(fitsim)
   
   hdulist = pf.open(fitsim)
@@ -382,6 +368,9 @@ kwargs:
 
 
 def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
+    '''
+    imsize in deg
+    '''
     
     if os.path.exists(fitsname):
         if clobber:
@@ -390,9 +379,6 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
             print 'file exists and clobber is False: ',fitsname
             return
         
-    '''
-    imsize in deg
-    '''
     s = int(imsize*3600.*4)  #arcsec to pix seems to be 4pix=1arcsec
     
     wgeturl = "http://ps1images.stsci.edu/cgi-bin/ps1cutouts?pos={ra:f}+{dec:f}&filter=color&filter={f:s}&filetypes=stack&auxiliary=data&size={s:d}&output_size=0&verbose=0&autoscale=99.500000&catlist=".format(ra=ra,dec=dec,f=f,s=s)
@@ -467,21 +453,7 @@ kwargs:
             print ' '.join(base)
         sub.Popen( base ).wait()
         size = os.path.getsize('tempout%05i' %(N))
-        #os.system('fitscheck tempout%05i > tempoutfits%05i' %(N,N))
-        
-        #with open('tempoutfits%05i' %(N)) as t:
-            #fline = t.readline().strip()
-            #if "Header missing END card" in fline:
-                #print "Failed"
-                #return False
-            #elif "Empty or corrupt FITS file" in fline:
-                #print "Failed"
-                #return False
-            #elif "Checksum not found" in fline:
-                #print 'checksum error'
-                #sub.Popen(['mv', 'tempout%05i' %(N), fitscut]).wait()
-                ##print fitscut
-                #return True
+
         
         try:
             print 'try open'
@@ -631,7 +603,7 @@ returns
     #result = cutout_from_server(fitscut, url=url)
     #return result
 
-def get_NDWFS_cutout_MAGES(fitsname, ra,dec, imsize = 2., band='I', verbose=0, clobber=False):
+def get_NDWFS_cutout_MAGES(fitsname, ra,dec, user, password, imsize = 2., band='I', verbose=0, clobber=False):
     
   if os.path.exists(fitsname):
     if clobber:
@@ -687,221 +659,8 @@ def get_NDWFS_cutout_MAGES(fitsname, ra,dec, imsize = 2., band='I', verbose=0, c
       print 'not in mages'
       return
   
-  url=" --user=NDWFScutout --password=givemedata!  http://www.noao.edu/ndwfs/cutout.dh5.php?ra=%s&dec=%s&rawidth=%.1f&decwidth=%.1f&s_filter_id=%i" %(sra, sdec, imsize, imsize, bandid)
+  url=" --user=%s --password=%s  http://www.noao.edu/ndwfs/cutout.dh5.php?ra=%s&dec=%s&rawidth=%.1f&decwidth=%.1f&s_filter_id=%i" %(user, password, sra, sdec, imsize, imsize, bandid)
   
   result = cutout_from_server(fitsname, url=url)
   return result
   
-  
-  #if (not os.path.isfile(fitsname)) or clobber:
-    #print '...downloading'
-    #N = np.random.uniform(1,100000)
-    #sub.Popen(["wget", "-q" ,"-O", 'tempout%05i' %(N) ,"--user=NDWFScutout", "--password=givemedata!" , url]).wait()
-    #if verbose > 2:
-        #print ' '.join(["wget", "-q" ,"-O", 'tempout%05i' %(N),"--user=NDWFScutout", "--password=givemedata!" , url])
-    #size = os.path.getsize('tempout%05i' %(N))
-
-    #if size > 100.:
-      #sub.Popen(['mv', 'tempout%05i' %(N), fitsname]).wait()
-      #print fitsname
-    #else:
-      #sub.Popen(['rm', 'tempout%05i' %(N)]).wait()
-  #return 
-
-    
-#def get_NDWFS_cutout(ra,dec, fitsname, band='I', imsize = 2., verbose=0):
-    
-  #print 'cutout %s' %(fitsname)
-  ##imsize in arcmin
-  #sra = ra_to_str( ra )
-  #sdec = dec_to_str( dec )
-  #url = "http://archive.noao.edu/ndwfs/cutout.php?ra=%s&dec=%s&rawidth=%.1f&decwidth=%.1f&filter=%s"    %(sra, sdec, imsize, imsize, band)
-  
-  ##url="http://www.noao.edu/ndwfs/cutout-form.dh5.php?ra=%s&dec=%s&rawidth=%.1f&decwidth=%.1f&filter=%s"    %(sra, sdec, imsize, imsize, band)
-  
-  ##url="http://www.noao.edu/ndwfs/cutout.dh5.php?ra=14:31:18.2&dec=35:15:50&rawidth=2.0&decwidth=2.0&s_filter_id=25"
-  
-  #if (not os.path.isfile(fitsname)) or clobber:
-    #print '...downloading'
-    #N = np.random.uniform(1,100000)
-    #sub.Popen(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url]).wait()
-    #if verbose > 2:
-        #print ' '.join(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url])
-    #size = os.path.getsize('tempout%05i' %(N))
-
-    #if size > 91.:
-      #sub.Popen(['mv', 'tempout%05i' %(N), fitsname]).wait()
-      #print fitsname
-    #else:
-      #sub.Popen(['rm', 'tempout%05i' %(N)]).wait()
-  #return 
-
-#def get_SDWFS_cutout(ra,dec, fitsname, band='I1', imsize = 1./60., verbose=0):
-  #print 'cutout %s' %(fitsname)
-  ##imsize in degrees
-  #url = "http://irsa.ipac.caltech.edu/cgi-bin/Subimage/nph-subimage?origfile=/irsadata/SPITZER/SDWFS//images/combined_epochs/%s_bootes.v32.fits&ra=%f&dec=%f&xsize=%f"    %(band, ra, dec, imsize)
-  
-  #if (not os.path.isfile(fitsname)) or clobber:
-    #print '...downloading'
-    #N = np.random.uniform(1,100000)
-    #sub.Popen(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url]).wait()
-    #if verbose > 2:
-        #print ' '.join(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url])
-    #size = os.path.getsize('tempout%05i' %(N))
-
-    #if size > 91.:
-      #sub.Popen(['mv', 'tempout%05i' %(N), fitsname]).wait()
-      #print fitsname
-    #else:
-      #sub.Popen(['rm', 'tempout%05i' %(N)]).wait()
-  #return 
-
-  
-  
-#def get_MAGES_cutout_from_file(ra,dec, fitsname, band='M1', imsize = 1./60., verbose=0):
-    
-  #if (not os.path.isfile(fitsname)) or clobber:
-    #imsize = imsize*3600.  #in arcsec
-    #if verbose > 2:
-        #print 'cutout %s' %(fitsname)
-    ##imsize in degrees
-
-    #if band == 'M1':
-        #bigfits = 'mages/mages_24_Emos0.5_BF4_tile2.fits'
-
-    #head = pf.getheader(bigfits)
-
-    #hdulist = pf.open(bigfits)
-    ## Parse the WCS keywords in the primary HDU
-    #wcs = pw.WCS(hdulist[0].header)
-
-    ## Some pixel coordinates of interest.
-    #skycrd = np.array([ra,dec])
-    #skycrd = np.array([[ra,dec,0,0]], np.float_)
-    #pixel = wcs.wcs_sky2pix(skycrd, 1)
-    ## Some pixel coordinates of interest.
-
-    #x = pixel[0][0]
-    #y = pixel[0][1]
-    ## calculate number of pixels to copy
-    #pixsize = abs(wcs.wcs.cdelt[0])
-    #if np.isnan(imsize):
-        #imsize = 25.
-    #N = 10.*(imsize/pixsize)
-    #if verbose > 2:
-        #print 'x=%.5f, y=%.5f, N=%i' %(x,y,N)
-
-    #ximgsize = head.get('NAXIS1')
-    #yimgsize = head.get('NAXIS2')
-
-    #if x ==0:
-        #x = ximgsize/2
-    #if y ==0:
-        #y = yimgsize/2
-
-    #offcentre = False
-    ## subimage limits: check if runs over edges
-    #xlim1 =  x - (N/2)
-    #if(xlim1<1):
-        #xlim1=1
-        #offcentre=True
-        #xlim2 =  x + (N/2)
-    #if(xlim2>ximgsize):
-        #xlim2=ximgsize
-        #offcentre=True
-        #ylim1 =  y - (N/2)
-    #if(ylim1<1):
-        #ylim1=1
-        #offcentre=True
-        #ylim2 =  y + (N/2)
-    #if(ylim2>yimgsize):
-        #offcentre=True
-        #ylim2=yimgsize
-
-    #xl = int(xlim1)
-    #yl = int(ylim1)
-    #xu = int(xlim2)
-    #yu = int(ylim2)
-    #if verbose > 2:
-        #print 'postage stamp is %i x %i pixels' %(xu-xl,yu-yl)
-
-    ## make fits cutout
-    #inps = bigfits + '[%0.0f:%0.0f,%0.0f:%0.0f]' %(xl,xu,yl,yu)
-  
-    #sub.Popen(["fitscopy", inps, fitsname]).wait()
-
-    #return 
-
-  
-#def get_first_cutout(fitsname,ra,dec,imsize=3.0, verbose=0):
-    #sra = ra_to_str( ra )
-    #sdec = dec_to_str( dec )
-    #url = "third.ucllnl.org/cgi-bin/firstimage?RA=%s %s&Dec=&Equinox=J2000&ImageSize=%.1f&MaxInt=10&FITS=1&Download=1" %(sra,sdec,imsize)
-    ## get the first image
-    #if not os.path.isfile(fitsname) or clobber:
-        #print 'getting first image: ',url
-        #sub.Popen(["wget","-q","-O",fitsname,url]).wait()
-        #if verbose > 2:
-            #print ' '.join(["wget","-q","-O",fitsname,url])
-    #return
-    
-#def get_WSRT_cutout(ra,dec, fitsname, band='I', imsize=2., verbose=0, clobber=1):
-    
-    ##fitsname  = 'cut3050-5.fits.gz'
-    ##'http://www.astron.nl/wow/zip/%s' %(fitsname)
-  #print 'cutout %s' %(fitsname)
-  ##imsize in arcmin
-  #sra = ra_to_str( ra ).replace(':','+')
-  #sdec = dec_to_str( dec ).replace(':','+')
-  #url = "http://www.astron.nl/wow/testcode.php?POS=%s+%s%s&Equinox=J2000&SIZE=%.1f%s+%.1f&cutout=1&surv_id=5"    %(sra, r'%2B', sdec, imsize, r'%2C', imsize)
-  
-  ##url="http://www.noao.edu/ndwfs/cutout-form.dh5.php?ra=%s&dec=%s&rawidth=%.1f&decwidth=%.1f&filter=%s"    %(sra, sdec, imsize, imsize, band)
-  
-  ##url="http://www.noao.edu/ndwfs/cutout.dh5.php?ra=14:31:18.2&dec=35:15:50&rawidth=2.0&decwidth=2.0&s_filter_id=25"
-  
-  #if (not os.path.isfile(fitsname)) or clobber:
-    #print '...downloading'
-    #N = np.random.uniform(1,100000)
-    #sub.Popen(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url]).wait()
-    #if verbose > 2:
-        #print ' '.join(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url])
-    #size = os.path.getsize('tempout%05i' %(N))
-
-    
-    
-    #t = open('tempout%05i' %(N),'r')
-    #tt = t.readlines()
-    #ttt = ' '.join(tt)
-    
-    ##print 'tempout%05i' %(N)
-    ##cmd = ["cat", "tempout%05i"%(N), "|","grep" ,"'No data available'" ,"|" ,"wc", "-l" ]
-    ##wc = sub.Popen(["cat", "tempout%05i"%(N), "|","grep" ,"'No data available'" ,"|" ,"wc", "-l" ], stdout=sub.PIPE, stderr=sub.PIPE)
-    ##print cmd
-    ##print wc
-    ##if wc == 0:
-        ##print 'no data'
-        ##return 0
-        
-    
-    ##os.system('cat tempout%05i |grep fits > templine%05i' %(N,N))
-    
-    ##t = open('templine%05i' %(N),'r')
-    ##tt = t.readlines()
-    ##ttt = tt[0]
-    #i2 = ttt.find('No data available')
-    #if i2 > 0:
-        #print 'no coverage'
-        #sub.Popen(['rm', 'tempout%05i' %(N)]).wait()
-        #return 0
-        
-    #i2 = ttt.find('fits')
-    #fitspath = ttt[i2-14:i2+7]
-    #url = 'http://www.astron.nl/wow/%s' %(fitspath)
-    #sub.Popen(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url]).wait()
-    #if verbose > 2:
-        #print ' '.join(["wget", "-q" ,"-O", 'tempout%05i' %(N) , url])
-    
-    #sub.Popen(['mv', 'tempout%05i' %(N), fitsname+'.gz']).wait()
-    #sub.Popen(['gunzip', fitsname+'.gz']).wait()
-    #print fitsname
-    #return 1
