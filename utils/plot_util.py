@@ -341,7 +341,7 @@ def make_ax3():
 
 
 
-def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname):
+def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname, markers=None):
     
     import astropy.io.fits as fits
     from astropy.stats import sigma_clipped_stats
@@ -382,6 +382,7 @@ def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname):
 
 
     
+    m1, m2, rms, vm = get_noise(radio_cutout, vm=True)
     radiomax=np.nanmax(fits.getdata(radio_cutout))
     drlimit=2000
     #print radiomax/drlimit,rms*2.0
@@ -400,6 +401,9 @@ def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname):
     ax0.scalebar.set_label("$1'$")  # length in degrees
     ax0.scalebar.set_font(size='small')
     ax0.ticks.hide()
+    
+    if markers is not None:
+        ax0.show_markers(markers['ra'],markers['dec'])
     
     f.savefig(outname)
     
