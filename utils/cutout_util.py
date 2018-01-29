@@ -524,7 +524,9 @@ returns
     sdec = dec_to_str( dec )
     imsize = imsize*60.  # in arcmin
     
-    url = "http://archive.noao.edu/ndwfs/cutout.php?ra={ra}&dec={dec}&rawidth={imsize:.1f}&decwidth={imsize:.1f}&filter={band}".format(ra=sra, dec=sdec, imsize=imsize, band=band)
+    #url = "http://archive.noao.edu/ndwfs/cutout.php?ra={ra}&dec={dec}&rawidth={imsize:.1f}&decwidth={imsize:.1f}&filter={band}".format(ra=sra, dec=sdec, imsize=imsize, band=band)
+    
+    url = "http://r2.sdm.noao.edu/ndwfs/cutout.php?ra={ra}&dec={dec}&rawidth={imsize:.1f}&decwidth={imsize:.1f}&filter={band}".format(ra=sra, dec=sdec, imsize=imsize, band=band)
     
     result = cutout_from_server(fitscut, url=url)
     return result
