@@ -135,6 +135,16 @@ def paper_double_mult_ax(nrows=1, ncols=1, setticks=True, **kwargs):
     return f, ax
 
 
+def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None):
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    return
 
 def donley_mask(f_ch1, f_ch2, f_ch3, f_ch4, mags=True):
     '''Select sources using the Donley+ 2012 criteria
