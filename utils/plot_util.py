@@ -135,6 +135,16 @@ def paper_double_mult_ax(nrows=1, ncols=1, setticks=True, **kwargs):
     return f, ax
 
 
+def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None):
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    return
 
 def donley_mask(f_ch1, f_ch2, f_ch3, f_ch4, mags=True):
     '''Select sources using the Donley+ 2012 criteria
@@ -339,6 +349,79 @@ def make_ax3():
     
     return f,ax,axx,axy
 
+
+
+def plot_opt_radio_overlay(opt_cutout, radio_cutout, outname, markers=None):
+    
+    import astropy.io.fits as fits
+    from astropy.stats import sigma_clipped_stats
+    import aplpy as ap
+    
+    def flatten(fitsin):
+        fh = fits.open(fitsin)
+        data = fh[0].data.squeeze() # drops the size-1 axes
+        header = fh[0].header
+        mywcs = wcs.WCS(header).celestial
+        new_header = mywcs.to_header()
+        new_fh = fits.PrimaryHDU(data=data, header=new_header)
+        new_fh.writeto(fitsin, clobber=True)
+        return
+
+    def  get_noise(fitsfile, vm=False):
+        dat = fits.getdata(fitsfile)
+        if np.sum(np.isfinite(dat))==0:
+            return np.nan, np.nan, np.nan
+        mean, median, stddev = sigma_clipped_stats(dat, sigma=5, iters=10)
+        if not vm:
+            return mean, median, stddev
+        else:
+            vmax=np.median(dat[dat>(mean+5*stddev)])
+            return mean, median, stddev, vmax
+
+    
+    
+    f = plt.figure()
+    #ax1 = f.add_subplot(121)
+    ##ax2 = f.add_subplot(122)
+    
+    
+    m1, m2, rms, vm = get_noise(opt_cutout, vm=True)
+    
+    ax0 = ap.FITSFigure(opt_cutout,figure=f,north=True)
+    ax0.show_colorscale(vmin=m1+1*rms, vmax=vm, stretch='log')
+
+
+    
+    m1, m2, rms, vm = get_noise(radio_cutout, vm=True)
+    radiomax=np.nanmax(fits.getdata(radio_cutout))
+    drlimit=2000
+    #print radiomax/drlimit,rms*2.0
+    minlevel=max([radiomax/drlimit,rms*2.0])
+    levels=minlevel*2.0**np.linspace(0,14,30)
+    ax0.show_contour(radio_cutout, levels=levels, colors='y')
+    
+
+    
+    ax0.hide_axis_labels()
+    ax0.hide_tick_labels()
+    
+    ax0.add_scalebar(1/60.)  # size in deg
+    ax0.scalebar.set_color('w')
+    ax0.scalebar.set_corner('top right')
+    ax0.scalebar.set_label("$1'$")  # length in degrees
+    ax0.scalebar.set_font(size='small')
+    ax0.ticks.hide()
+    
+    if markers is not None:
+        ax0.show_markers(markers['ra'],markers['dec'])
+    
+    f.savefig(outname)
+    
+    plt.close()
+    
+
+
+    return
 
 
 def nanhist(x,**kwargs):
