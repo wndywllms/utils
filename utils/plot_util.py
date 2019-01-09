@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib as mpl
 #mpl.use('Agg')
-mpl.rc_file('/home/wwilliams/.config/matplotlib/matplotlibrc')  # <-- the file containing your settings
+mpl.rc_file('~/.config/matplotlib/matplotlibrc')  # <-- the file containing your settings
 import matplotlib.pyplot as plt
 
 
@@ -246,7 +246,7 @@ def plot_mir_colours(m1,m2,m3,m4, ax=None, spec_ind=None, col=None, vmin=None, v
             vmax = max(col)
         c=ax.scatter(m3 -m4,  m1-m2, c=col, marker='o', edgecolor='none', vmin=vmin, vmax=vmax)
         try: plt.colorbar(c)
-        except: print "error"
+        except: print("error")
     
     if spec_ind is not None:
         if col is None:
