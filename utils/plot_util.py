@@ -135,7 +135,7 @@ def paper_double_mult_ax(nrows=1, ncols=1, setticks=True, **kwargs):
     return f, ax
 
 
-def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None):
+def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None, xtick_spacing=None, xtick_min_spacing=None, ytick_spacing=None, ytick_min_spacing=None ):
     if xlabel is not None:
         ax.set_xlabel(xlabel)
     if ylabel is not None:
@@ -144,6 +144,14 @@ def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None):
         ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
+    if xtick_spacing is not None:
+        ax.xaxis.set_major_locator(mpl.ticker.MultipleLocator(xtick_spacing))
+    if xtick_min_spacing is not None:
+        ax.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick_min_spacing))
+    if ytick_spacing is not None:
+        ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(ytick_spacing))
+    if ytick_min_spacing is not None:
+        ax.yaxis.set_minor_locator(mpl.ticker.MultipleLocator(ytick_min_spacing))
     return
 
 
