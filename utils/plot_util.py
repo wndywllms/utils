@@ -146,6 +146,19 @@ def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None):
         ax.set_ylim(ylim)
     return
 
+
+def invert_ylim(ax):
+    y1, y2 = ax.get_ylim()
+    ax.set_ylim(y2, y1)
+    return
+
+
+def invert_xlim(ax):
+    x1, x2 = ax.get_xlim()
+    ax.set_xlim(x2, x1)
+    return
+
+
 def donley_mask(f_ch1, f_ch2, f_ch3, f_ch4, mags=True):
     '''Select sources using the Donley+ 2012 criteria
     returns  - array 1 where source in stern wedge, 0 where outside and -1 where any mag is nan
