@@ -5,7 +5,8 @@
 import subprocess as sub
 import numpy as np
 import pyfits as pf
-import pywcs as pw
+#import pywcs as pw
+import astropy.wcs as pw
 import aplpy as ap
 import os
 from sky_util import *
