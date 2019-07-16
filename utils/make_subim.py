@@ -61,11 +61,12 @@ def cube_extract(f,ra,dec,x,y,size,size2=None,hduid=0,verbose=True):
     if verbose:
         print slice
 
+    header['HISTORY'] = 'cube_extract'
     hdu=fits.PrimaryHDU(f[hduid].data[slice],header)
     copy=('EQUINOX','EPOCH','BMAJ','BMIN','BPA')
     for k in copy:
         r=f[hduid].header.get(k)
-        if r:
+        if r is not None:
             hdu.header[k]=r
     if 'TAN' in hdu.header['CTYPE1']:
         hdu.header['LATPOLE']=f[hduid].header['CRVAL2']
@@ -139,11 +140,12 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
     if verbose:
         print slice
 
+    header['HISTORY'] = 'flatten'
     hdu=fits.PrimaryHDU(f[hduid].data[slice],header)
     copy=('EQUINOX','EPOCH','BMAJ','BMIN','BPA')
     for k in copy:
         r=f[hduid].header.get(k)
-        if r:
+        if r is not None:
             hdu.header[k]=r
     if 'TAN' in hdu.header['CTYPE1']:
         hdu.header['LATPOLE']=f[hduid].header['CRVAL2']
