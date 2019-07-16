@@ -5,8 +5,12 @@ mpl.rc_file('~/.config/matplotlib/matplotlibrc')  # <-- the file containing your
 import matplotlib.pyplot as plt
 
 
-def fig_save_many(f, name, types=[".png",".pdf"], dpi=200):
+def fig_save_many(f, name, types=[".png"], dpi=200):
+    if not isinstance(types, list):
+        types = [types]
     for ext in types:
+        if ext[0] != '.':
+            ext = '.'+ext
         f.savefig(name+ext, dpi=dpi)
     return
 

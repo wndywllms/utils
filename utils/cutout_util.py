@@ -2,6 +2,14 @@
 # using just a fits file
 # or varius cutout servers
 
+from astroquery.skyview import SkyView
+import astropy.coordinates as coord
+import astropy.units as u
+
+from lxml import html
+import requests
+import shutil
+
 import subprocess as sub
 import numpy as np
 import pyfits as pf
@@ -13,6 +21,33 @@ from sky_util import *
 
 VERBOSE = 10
 clobber=True
+
+def download_file(url,outname):
+    if os.path.isfile(outname):
+        print 'File',outname,'already exists, skipping'
+    else:
+        print 'Downloading',outname
+        while True:
+            try:
+                response = requests.get(url, stream=True,verify=False,timeout=120)
+                if response.status_code!=200:
+                    print 'Warning, HTML status code',response.status_code
+                    if response.status_code>=500 and response.status_code<600:
+                        raise RuntimeError('Retry!')
+            except requests.exceptions.ConnectionError:
+                print 'Connection error! sleeping 60 seconds before retry...'
+                sleep(60)
+            except RuntimeError:
+                print 'Transient error reported, retrying after sleep'
+                sleep(60)
+            except requests.exceptions.Timeout:
+                print 'Timeout: retrying download'
+            else:
+                break
+        with open(outname, 'wb') as out_file:
+            shutil.copyfileobj(response.raw, out_file)
+        del response
+        
 
 def plot_image(fits,ax, rms=np.nan, F=np.nan, cont=None, contcol='r', stretch='sqrt'):
   ax.set_frame_color('k')
@@ -422,6 +457,42 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
     os.system('rm -rf ttt')
     return fitsname
 
+def get_first(ra,dec):
+    url="http://archive.stsci.edu/"
+    page=requests.get(url+"vlafirst/search.php?RA=%.7f&DEC=%.6f&Radius=30.0&action=Search" % (ra,dec),verify=False)
+    print page.status_code
+
+    tree=html.fromstring(page.text)
+    table=tree.xpath('//tbody')
+    links=[]
+    dists=[]
+    for row in table[0].getchildren():
+        td=row.getchildren()
+        links.append(td[0].getchildren()[0].attrib['href'])
+        dists.append(float(td[8].text))
+
+    index=np.argmin(dists)
+    path=links[index]
+   
+    outname=path.split('/')[-1]
+    download_file(url+path,outname)
+    return outname
+
+
+def get_nvss(ra,dec,size=1000):
+    # uses skyview
+    coords=coord.SkyCoord(ra, dec, unit=(u.deg, u.deg))
+    paths = SkyView.get_images(position=coords.to_string('hmsdms'),survey='NVSS',width=size*u.arcsec)
+    hdu = paths[0]
+    hdu[0].header['BMAJ']=45.0/3600.0
+    hdu[0].header['BMIN']=45.0/3600.0
+    hdu[0].header['BPA']=0
+    hdu[0].header['RESTFREQ']=1.4e9
+    filename='NVSS-'+coords.to_string('hmsdms').replace(' ','')+'.fits'
+    hdu.writeto(filename)
+    return filename
+
+
 def cutout_from_server(fitscut, url="", clobber=False):
     """ get a fits cutout from a server
 args:
@@ -586,25 +657,25 @@ returns
     return result
 
 
-#def get_nvss_cutout(fitscut, ra, dec, imsize):
-    #""" get a fits cutout from NVSS server
-#args:
-    #fitscut - name of cutout
-    #ra      - degrees
-    #dec     - degrees
-    #imsize  - size of cutout in degrees
-#returns
-    #result  - success?
-    #"""
-    #sra = ra_to_str( ra )
-    #sdec = dec_to_str( dec )
-    #imsize = imsize * 60.
+def get_nvss_cutout(fitscut, ra, dec, imsize):
+    """ get a fits cutout from NVSS server
+args:
+    fitscut - name of cutout
+    ra      - degrees
+    dec     - degrees
+    imsize  - size of cutout in degrees
+returns
+    result  - success?
+    """
+    sra = ra_to_str( ra )
+    sdec = dec_to_str( dec )
+    imsize = imsize * 60.
     
-    #url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
+    url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
     
-    #print url
-    #result = cutout_from_server(fitscut, url=url)
-    #return result
+    print url
+    result = cutout_from_server(fitscut, url=url)
+    return result
 
 def get_NDWFS_cutout_MAGES(fitsname, ra,dec, user, password, imsize = 2., band='I', verbose=0, clobber=False):
     
