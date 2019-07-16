@@ -14,7 +14,7 @@ def fig_save_many(f, name, types=[".png"], dpi=200):
         f.savefig(name+ext, dpi=dpi)
     return
 
-def paper_single(TW = 6.64, AR = 0.74, FF = 1., fontsize=18.0, fontst="Times"):
+def paper_single(TW = 6.64, AR = 0.74, FF = 1., fontsize=18.0, fontst=["Times New Roman", "Computer Modern Roman", "STIXGeneral"]):
     '''paper_single(TW = 6.64, AR = 0.74, FF = 1.)
     TW = 3.32
     AR = 0.74
