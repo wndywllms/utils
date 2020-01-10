@@ -17,31 +17,31 @@ import pyfits as pf
 import astropy.wcs as pw
 import aplpy as ap
 import os
-from sky_util import *
+from .sky_util import *
 
 VERBOSE = 10
 clobber=True
 
 def download_file(url,outname):
     if os.path.isfile(outname):
-        print 'File',outname,'already exists, skipping'
+        print('File',outname,'already exists, skipping')
     else:
-        print 'Downloading',outname
+        print('Downloading',outname)
         while True:
             try:
                 response = requests.get(url, stream=True,verify=False,timeout=120)
                 if response.status_code!=200:
-                    print 'Warning, HTML status code',response.status_code
+                    print('Warning, HTML status code',response.status_code)
                     if response.status_code>=500 and response.status_code<600:
                         raise RuntimeError('Retry!')
             except requests.exceptions.ConnectionError:
-                print 'Connection error! sleeping 60 seconds before retry...'
+                print('Connection error! sleeping 60 seconds before retry...')
                 sleep(60)
             except RuntimeError:
-                print 'Transient error reported, retrying after sleep'
+                print('Transient error reported, retrying after sleep')
                 sleep(60)
             except requests.exceptions.Timeout:
-                print 'Timeout: retrying download'
+                print('Timeout: retrying download')
             else:
                 break
         with open(outname, 'wb') as out_file:
@@ -61,7 +61,7 @@ def plot_image(fits,ax, rms=np.nan, F=np.nan, cont=None, contcol='r', stretch='s
   try:
     image = pf.getdata(fits)
   except:
-    print 'problem with image: ',fits
+    print('problem with image: ',fits)
     return
   ximgsize = head.get('NAXIS1')
   yimgsize = head.get('NAXIS2')
@@ -141,8 +141,8 @@ def postage(fitsim,postfits,ra,dec,s=2./60, verbose=0):
     s = 25.
   N = s/pixsize
   if verbose > 2:
-      print "making cutout %s from fits %s at ra,dec=%.5f, %.5f and size %.3f'" %(fitsim,postfits,ra,dec,s*60)
-      print 'x=%.5f, y=%.5f, N=%i' %(x,y,N)
+      print("making cutout %s from fits %s at ra,dec=%.5f, %.5f and size %.3f'" %(fitsim,postfits,ra,dec,s*60))
+      print('x=%.5f, y=%.5f, N=%i' %(x,y,N))
 
   ximgsize = head.get('NAXIS1')
   yimgsize = head.get('NAXIS2')
@@ -176,7 +176,7 @@ def postage(fitsim,postfits,ra,dec,s=2./60, verbose=0):
   xu = int(xlim2)
   yu = int(ylim2)
   if verbose > 2:
-    print 'postage stamp is %i x %i pixels' %(xu-xl,yu-yl)
+    print('postage stamp is %i x %i pixels' %(xu-xl,yu-yl))
 
   # make fits cutout
   inps = fitsim + '[%0.0f:%0.0f,%0.0f:%0.0f]' %(xl,xu,yl,yu)
@@ -205,7 +205,7 @@ kwargs:
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
         
     
@@ -228,9 +228,9 @@ kwargs:
     pixsize = abs(wcs.wcs.cdelt[0])
     N = imsize/pixsize
     #if VERBOSE > 2:
-    print "making cutout %s from fits %s at ra,dec=%.5f, %.5f and size %.3f'" %(local_file,fitscut,ra,dec,imsize*60)
+    print("making cutout %s from fits %s at ra,dec=%.5f, %.5f and size %.3f'" %(local_file,fitscut,ra,dec,imsize*60))
     #if VERBOSE > 5:
-    print 'x=%.5f, y=%.5f, N=%i' %(x,y,N)
+    print('x=%.5f, y=%.5f, N=%i' %(x,y,N))
 
     ximgsize = head.get('NAXIS1')
     yimgsize = head.get('NAXIS2')
@@ -264,7 +264,7 @@ kwargs:
     xu = int(xlim2)
     yu = int(ylim2)
     if VERBOSE > 5:
-        print 'postage stamp is %i x %i pixels' %(xu-xl,yu-yl)
+        print('postage stamp is %i x %i pixels' %(xu-xl,yu-yl))
 
     # make fits cutout
     inps = local_file + "[%0.0f:%0.0f,%0.0f:%0.0f]" %(xl,xu,yl,yu)
@@ -289,7 +289,7 @@ kwargs:
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
 
     import astropy.coordinates as ac
@@ -300,7 +300,7 @@ kwargs:
     idx, sep, dist =  ac.match_coordinates_sky(C, ac.SkyCoord(t['ra'],t['dec'],unit='deg'))
     fitsname = t['name'][idx]
     
-    print 'nearest fitsimage is',fitsname
+    print('nearest fitsimage is',fitsname)
     
     cutout_from_local_file(fitscut, ra, dec, imsize, local_file=local_file_path+'/'+fitsname)
     
@@ -325,7 +325,7 @@ kwargs:
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
     
     imdat = np.genfromtxt(local_file_list, dtype='S15,f,f,f,f', names=['images','ramin','ramax','decmin','decmax'])
@@ -352,9 +352,9 @@ kwargs:
     pixsize = abs(wcs.wcs.cd[0][0])
     N = imsize/pixsize
     #if VERBOSE > 2:
-    print "making cutout %s from fits %s at ra,dec=%.5f, %.5f and size %.3f'" %(local_file,fitscut,ra,dec,imsize*60)
+    print("making cutout %s from fits %s at ra,dec=%.5f, %.5f and size %.3f'" %(local_file,fitscut,ra,dec,imsize*60))
     #if VERBOSE > 5:
-    print 'x=%.5f, y=%.5f, N=%i' %(x,y,N)
+    print('x=%.5f, y=%.5f, N=%i' %(x,y,N))
 
     ximgsize = head.get('NAXIS1')
     yimgsize = head.get('NAXIS2')
@@ -392,7 +392,7 @@ kwargs:
     xu = int(xlim2)
     yu = int(ylim2)
     if VERBOSE > 5:
-        print 'postage stamp is %i x %i pixels' %(xu-xl,yu-yl)
+        print('postage stamp is %i x %i pixels' %(xu-xl,yu-yl))
 
     # make fits cutout
     inps = local_file + "[%0.0f:%0.0f,%0.0f:%0.0f]" %(xl,xu,yl,yu)
@@ -412,14 +412,14 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
         if clobber:
             os.system('rm '+fitsname)
         else:
-            print 'file exists and clobber is False: ',fitsname
+            print('file exists and clobber is False: ',fitsname)
             return
         
     s = int(imsize*3600.*4)  #arcsec to pix seems to be 4pix=1arcsec
     
     wgeturl = "http://ps1images.stsci.edu/cgi-bin/ps1cutouts?pos={ra:f}+{dec:f}&filter=color&filter={f:s}&filetypes=stack&auxiliary=data&size={s:d}&output_size=0&verbose=0&autoscale=99.500000&catlist=".format(ra=ra,dec=dec,f=f,s=s)
     cmd = ['wget', wgeturl, '-O', 'ttt']
-    print ' '.join(cmd)
+    print(' '.join(cmd))
     p = sub.Popen(cmd)
     p.wait()
     with open('ttt','r') as ff:
@@ -437,22 +437,22 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
         i = line2.find('">')
         line3 = line2[:i]
         fits = line3
-        print fits
+        print(fits)
     else:
         line2 = line1[i:]
         i = line2.find('">')
         line3 = line2[:i]
         fits = line3
-        print fits
+        print(fits)
     #fitsname = 'panstars_{f:s}_{ra:f}+{dec:f}.fits'.format(name=fits,f=f,ra=ra,dec=dec)
     cmd = ['wget',fits, '-O', fitsname ]
-    print ' '.join(cmd)
+    print(' '.join(cmd))
     p=sub.Popen(cmd)
     p.wait()
     try:
         pf.open(fitsname)
     except:
-        print 'error downloading panstarrs cutout'
+        print('error downloading panstarrs cutout')
         return -1
     os.system('rm -rf ttt')
     return fitsname
@@ -460,7 +460,7 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
 def get_first(ra,dec):
     url="http://archive.stsci.edu/"
     page=requests.get(url+"vlafirst/search.php?RA=%.7f&DEC=%.6f&Radius=30.0&action=Search" % (ra,dec),verify=False)
-    print page.status_code
+    print(page.status_code)
 
     tree=html.fromstring(page.text)
     table=tree.xpath('//tbody')
@@ -507,14 +507,14 @@ kwargs:
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
     
     if VERBOSE > 2:
-        print "cutout from server %s" %(fitscut)
+        print("cutout from server %s" %(fitscut))
   
     if (not os.path.isfile(fitscut)) or clobber:
-        if VERBOSE > 5: print '...downloading'
+        if VERBOSE > 5: print('...downloading')
         N = np.random.uniform(1,100000)
         #print url
         base = ["wget", "-q" ,"-O", 'tempout%05i' %(N)]
@@ -522,17 +522,17 @@ kwargs:
         base = ["timeout", "60", "wget", "-q" ,"-O", 'tempout%05i' %(N)]
         base.extend(url.split())
         if VERBOSE > 5:
-            print ' '.join(base)
+            print(' '.join(base))
         sub.Popen( base ).wait()
         size = os.path.getsize('tempout%05i' %(N))
 
         
         try:
-            print 'try open'
+            print('try open')
             pf.open('tempout%05i' %(N))
         except IOError:
             #sub.Popen(['rm', 'tempout%05i' %(N)]).wait()
-            print "Failed"
+            print("Failed")
             return False
         except:
             #sub.Popen(['rm', 'tempout%05i' %(N)]).wait()
@@ -559,7 +559,7 @@ returns
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
     
     sra = ra_to_str( ra ).replace(':','+')
@@ -588,10 +588,10 @@ returns
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
     
-    print ra,dec
+    print(ra,dec)
     sra = ra_to_str( ra )
     sdec = dec_to_str( dec )
     imsize = imsize*60.  # in arcmin
@@ -620,7 +620,7 @@ returns
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
         
     url = "http://irsa.ipac.caltech.edu/cgi-bin/Subimage/nph-subimage?origfile=/irsadata/SPITZER/SDWFS//images/combined_epochs/{band}_bootes.v32.fits&ra={ra:f}&dec={dec:f}&xsize={imsize:f}".format(band=band, ra=ra, dec=dec, imsize=imsize)
@@ -643,7 +643,7 @@ returns
         if clobber:
             os.system('rm '+fitscut)
         else:
-            print 'file exists and clobber is False: ',fitscut
+            print('file exists and clobber is False: ',fitscut)
             return
     
     sra = ra_to_str( ra )
@@ -652,7 +652,7 @@ returns
     
     url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
     
-    print url
+    print(url)
     result = cutout_from_server(fitscut, url=url)
     return result
 
@@ -673,7 +673,7 @@ returns
     
     url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
     
-    print url
+    print(url)
     result = cutout_from_server(fitscut, url=url)
     return result
 
@@ -683,10 +683,10 @@ def get_NDWFS_cutout_MAGES(fitsname, ra,dec, user, password, imsize = 2., band='
     if clobber:
         os.system('rm '+fitsname)
     else:
-        print 'file exists and clobber is False: ',fitsname
+        print('file exists and clobber is False: ',fitsname)
         return
     
-  print 'cutout %s' %(fitsname)
+  print('cutout %s' %(fitsname))
   #imsize in arcmin
   sra = ra_to_str( ra )
   sdec = dec_to_str( dec )
@@ -696,7 +696,7 @@ def get_NDWFS_cutout_MAGES(fitsname, ra,dec, user, password, imsize = 2., band='
   ndwfs_cutout_bands = np.array((np.nan, np.nan, 1, 2, 3, 4, 28, 30, np.nan, 5, 6, 7, 8, 25))
   bandid = ndwfs_cutout_bands[bands.index(band)]
   if verbose > 2:
-    print band, bandid
+    print(band, bandid)
   '''
 1 'Bw'
 2 'R'
@@ -730,7 +730,7 @@ def get_NDWFS_cutout_MAGES(fitsname, ra,dec, user, password, imsize = 2., band='
 30 'Ks'
   '''
   if np.isnan(bandid):
-      print 'not in mages'
+      print('not in mages')
       return
   
   url=" --user=%s --password=%s  http://www.noao.edu/ndwfs/cutout.dh5.php?ra=%s&dec=%s&rawidth=%.1f&decwidth=%.1f&s_filter_id=%i" %(user, password, sra, sdec, imsize, imsize, bandid)

@@ -24,7 +24,7 @@ def cube_extract(f,ra,dec,x,y,size,size2=None,hduid=0,verbose=True):
         size2 = size
 
     if verbose:
-        print f[hduid].data.shape
+        print(f[hduid].data.shape)
     ds=f[hduid].data.shape[-2:]
     by,bx=ds
     xmin=int(x-size)
@@ -42,7 +42,7 @@ def cube_extract(f,ra,dec,x,y,size,size2=None,hduid=0,verbose=True):
     
     if ymax<=ymin or xmax<=xmin:
         # this can only happen if the required position is not on the map
-        print xmin,xmax,ymin,ymax
+        print(xmin,xmax,ymin,ymax)
         raise RuntimeError('Failed to make subimage!')
 
     w = WCS(f[hduid].header)
@@ -59,7 +59,7 @@ def cube_extract(f,ra,dec,x,y,size,size2=None,hduid=0,verbose=True):
         else:
             slice.append(np.s_[:])
     if verbose:
-        print slice
+        print(slice)
 
     header['HISTORY'] = 'cube_extract'
     hdu=fits.PrimaryHDU(f[hduid].data[slice],header)
@@ -89,7 +89,7 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
         size2 = size
 
     if verbose:
-        print f[hduid].data.shape
+        print(f[hduid].data.shape)
     ds=f[hduid].data.shape[-2:]
     by,bx=ds
     xmin=int(x-size)
@@ -107,7 +107,7 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
     
     if ymax<=ymin or xmax<=xmin:
         # this can only happen if the required position is not on the map
-        print xmin,xmax,ymin,ymax
+        print(xmin,xmax,ymin,ymax)
         raise RuntimeError('Failed to make subimage!')
 
     w = WCS(f[hduid].header)
@@ -138,7 +138,7 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
         else:
             slice.append(0)
     if verbose:
-        print slice
+        print(slice)
 
     header['HISTORY'] = 'flatten'
     hdu=fits.PrimaryHDU(f[hduid].data[slice],header)
@@ -154,15 +154,15 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
 
 def extract_subim(filename,ra,dec,size,size2=None,hduid=0,verbose=True,cubemode=False):
     if verbose:
-        print 'Opening',filename
+        print('Opening',filename)
     if size2 is None:
         size2 = size
     orighdu=fits.open(filename)
     psize=int(size/abs(orighdu[hduid].header['CDELT1']))
     psize2=int(size2/abs(orighdu[hduid].header['CDELT2']))
     if verbose:
-        print 'pix size is',psize,size
-        print 'pix size2 is',psize2,size2
+        print('pix size is',psize,size)
+        print('pix size2 is',psize2,size2)
     ndims=orighdu[hduid].header['NAXIS']
     pvect=np.zeros((1,ndims))
     lwcs=WCS(orighdu[hduid].header)
@@ -198,7 +198,7 @@ if __name__=='__main__':
                 c = SkyCoord(sys.argv[3],sys.argv[4], frame='icrs',unit=(u.hourangle, u.deg))
             ra=float(c.ra.degree)
             dec=float(c.dec.degree)
-            print ra,dec
+            print(ra,dec)
         extract_and_save(filename,ra,dec,size)
     elif len(sys.argv)==4:
         s=sys.argv[3][4:]
@@ -206,9 +206,9 @@ if __name__=='__main__':
         sc = SkyCoord(coord,unit=(u.hourangle,u.deg))
         ra=sc.ra.value
         dec=sc.dec.value
-        print 'Parsed coordinates to ra=%f, dec=%f' % (ra,dec)
+        print('Parsed coordinates to ra=%f, dec=%f' % (ra,dec))
         name=sys.argv[1]
         extract_and_save(filename,ra,dec,size)
     else:
-        print 'Call: filename size RA DEC _OR_ filename size ILTname.'
+        print('Call: filename size RA DEC _OR_ filename size ILTname.')
 

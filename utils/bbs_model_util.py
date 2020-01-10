@@ -111,7 +111,7 @@ def dec_to_str(ddec, delim='.'):
      
 
 def read_bbs(infile, verbose=False):
-    print '* reading input bbs skymodel: %s' %infile
+    print('* reading input bbs skymodel: %s' %infile)
     
     with open(infile,'r') as t:
         # read the first line as format line
@@ -247,8 +247,8 @@ def read_bbs(infile, verbose=False):
         patchdata.Dec[iPatch] = dec_to_str(np.average(tdec, weights=data.I[iPatchSources]))
    
     if verbose:
-        print 'BBS recarray: ', data
-        print 'BBS patches recarray: ', patchdata
+        print('BBS recarray: ', data)
+        print('BBS patches recarray: ', patchdata)
     
         
     return data, patchdata
@@ -256,7 +256,7 @@ def read_bbs(infile, verbose=False):
 
 def sort_by_flux(bbs_data, bbsdata_patches):
     ### NOTE should always sort by patch flux, because even if no patches are specified in the input bbs file, we automatically put each source in its own patch
-    print '* sorting by I flux'
+    print('* sorting by I flux')
     if len(bbsdata_patches) > 0:
         bbsdata_patches.sort(order='I')
         return bbs_data, bbsdata_patches[::-1]
@@ -265,7 +265,7 @@ def sort_by_flux(bbs_data, bbsdata_patches):
         return bbs_data[::-1], bbsdata_patches
 
 def write_bbsdata_to_file(bbsdata, bbsdata_patches, outbbs):
-    print '* writing output bbs skymodel: %s ' %outbbs
+    print('* writing output bbs skymodel: %s ' %outbbs)
     with open(outbbs, 'w') as f:
         write_columns = ['Name', 'Type', 'Patch', 'Ra', 'Dec', 'I', 'Q', 'U', 'V', 'ReferenceFrequency', 'SpectralIndex', 'MajorAxis', 'MinorAxis', 'Orientation']
         fmtline = "# (%s) = format" %(', '.join(write_columns))
@@ -299,8 +299,8 @@ def write_bbsdata_to_file(bbsdata, bbsdata_patches, outbbs):
         # no patches, just write sources
         # this should never happen!!
         else:
-            print "why do you have no patches?! there is a problem here..."
-            print " writing only the sources"
+            print("why do you have no patches?! there is a problem here...")
+            print(" writing only the sources")
             for i in range(len(bbsdata)):
                 source_columns = []
                 for col in write_columns:
@@ -314,10 +314,10 @@ def write_bbsdata_to_file(bbsdata, bbsdata_patches, outbbs):
 
 def write_region_file(bbsdata, bbsdata_patches, reg, gcol='blue', pcol='green', col='yellow'):
     '''write a region file for ds9 based on sources/patches'''
-    print '* writing output file: %s' %reg
+    print('* writing output file: %s' %reg)
     #region file
     if os.path.isfile(reg):
-        inp = raw_input('region file %s exists, overwrite (y)? ' %(reg))
+        inp = input('region file %s exists, overwrite (y)? ' %(reg))
         if inp in ['n','N','no','No']: return
     os.system('rm -f '+reg)
 
@@ -428,14 +428,14 @@ def rename_patch(bbsdata, bbsdata_patches, ra_c, dec_c, rad = 10./3600., patchro
     patchsep = angular_separation(patchRa, patchDec, ra_c, dec_c)
     patchind = np.where(patchsep<rad)[0]
     otherpatchind = np.where(patchsep>=rad)[0]
-    print ra_c, dec_c, patchind
+    print(ra_c, dec_c, patchind)
     if patchroot == '':
         patchroot = bbsdata_patches.Patch[patchind[0]]
     
     if len(patchind) > 1:
-        print 'more than 1 patch being combined'
+        print('more than 1 patch being combined')
     else:
-        print "only 1 patch"
+        print("only 1 patch")
     for pi in patchind:
         oldpatch = bbsdata_patches.Patch[pi]
         bbsdata_patches.Patch[pi] = patchroot
@@ -445,14 +445,14 @@ def rename_patch(bbsdata, bbsdata_patches, ra_c, dec_c, rad = 10./3600., patchro
             bbsdata.Patch[spind] = patchroot
     
     # keep only one of the patches that now have the same name
-    print patchind
+    print(patchind)
     selectpatches = np.append(otherpatchind, patchind[0])
     bbsdata_patches = bbsdata_patches[selectpatches]
     
     # update the patch info
     iPatch = np.where(bbsdata_patches.Patch == patchroot)[0]
     if len(iPatch) > 1:
-        print "we have some problem: too many patches with the new name"
+        print("we have some problem: too many patches with the new name")
     ThisPatch = bbsdata_patches[iPatch]
     iPatchSources = np.where(bbsdata.Patch == ThisPatch.Patch)
     bbsdata_patches.I[iPatch] = np.sum(bbsdata.I[iPatchSources])
@@ -506,7 +506,7 @@ def remove_sources(bbsdata, bbsdata_patches, ra_c, dec_c, rad = 10./3600.):
     return bbsdata, bbsdata_patches
 
 def plot_sky(bbsdata, bbsdata_patches, ra_c, dec_c, figname='bbs.skymodel.png', scale='log'):
-    print '* plotting image: %s' %(figname)
+    print('* plotting image: %s' %(figname))
     import pylab as pl
     fig = pl.figure()
     ax1 = pl.subplot(111)

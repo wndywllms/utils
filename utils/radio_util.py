@@ -70,13 +70,13 @@ def time_smearing(resolution,delta_Theta):
     # Given resolution and field of view (delta_theta) this returns a condition on the time smearing at the correlator
     delta_T = 1.37E4*resolution/delta_Theta
 
-    print 'Time averaging should be less than %s'%delta_T
+    print('Time averaging should be less than %s'%delta_T)
 
 
     # Time average smearing amplitude loss in http://adsabs.harvard.edu/full/1989ASPC....6..247B
     Reduction = 1-1.22E-9*(delta_Theta/resolution)**2.0 * delta_T**2.0
 
-    print 'At radius %s a source will only have %s percent of its flux if data smoothed in time to %s'%(delta_Theta,Reduction,delta_T)
+    print('At radius %s a source will only have %s percent of its flux if data smoothed in time to %s'%(delta_Theta,Reduction,delta_T))
     
     return delta_T
 
@@ -107,14 +107,14 @@ def bandwidth_smearing(freq,resolution,delta_Theta):
 
     delta_freq = freq*resolution/delta_Theta
 
-    print 'Bandwidth averaging should be much less than %s'%delta_freq
+    print('Bandwidth averaging should be much less than %s'%delta_freq)
 
     
     beta = (delta_freq/freq) * (delta_Theta/resolution)
     gamma = 2*(np.log(2)**0.5)
     Reduction = ((np.pi**0.5)/(gamma * beta)) * (scipy.special.erf(beta*gamma/2.0))
 
-    print 'At radius %s a source will only have %s percent of its flux if data smoothed in freq to %s'%(delta_Theta,Reduction,delta_freq)
+    print('At radius %s a source will only have %s percent of its flux if data smoothed in freq to %s'%(delta_Theta,Reduction,delta_freq))
 
     return delta_freq
 

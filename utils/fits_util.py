@@ -42,7 +42,7 @@ Returns
     data columns can be accessed by name
     '''
     if verbose > 0:
-        print 'loading data: %s' %(fitsname)
+        print('loading data: %s' %(fitsname))
         
     # load fits and get data cast to recarray
     t = pf.open(fitsname, ext=ext)
@@ -52,7 +52,7 @@ Returns
     t = data
     
     if verbose > 2:
-        print data.dtype.names
+        print(data.dtype.names)
         
     # select only some fields
     if len(fields) > 0:
@@ -92,7 +92,7 @@ Returns
             rec = a
         # print out the columns
         if verbose > 2:
-            print a.dtype.names
+            print(a.dtype.names)
     # choosing all columns
     else:
         a = t

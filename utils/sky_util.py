@@ -134,7 +134,7 @@ def match_celestial (ra1, dec1, ra2, dec2, radius, verbose=1):
              dist - matching sky distances in arcsec
     '''
     if verbose > 1:
-        print 'sky matching with radius %.3f arcsec' %(radius*3600.)
+        print('sky matching with radius %.3f arcsec' %(radius*3600.))
     # radius in degrees
     # coordinates in degrees
     # make everything arcsec

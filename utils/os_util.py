@@ -25,7 +25,7 @@ optional - specify max number of processes (default 2)
             cmdlog = ''
         if logs != 'none':
             with open(cmdlog,'w') as f:
-                print 'exec {icmd:d}: {cmd} > {log}'.format(cmd=cmd, icmd=icmd, log=cmdlog)
+                print('exec {icmd:d}: {cmd} > {log}'.format(cmd=cmd, icmd=icmd, log=cmdlog))
                 p = subprocess.Popen(cmd.split(), stdout=f, stderr=subprocess.STDOUT)
                 processes.add(p)
                 pid=p.pid
@@ -35,7 +35,7 @@ optional - specify max number of processes (default 2)
                     monitor_cmd = 'python {scriptpath}/monitorjob.py {pid} {monitorname}'.format(pid=pid, monitorname=monitorname, scriptpath=scriptpath)
                     process_monitors.add(subprocess.Popen(monitor_cmd.split()))
         else:
-            print 'exec {icmd:d}: {cmd} > {log}'.format(cmd=cmd, icmd=icmd, log=cmdlog)
+            print('exec {icmd:d}: {cmd} > {log}'.format(cmd=cmd, icmd=icmd, log=cmdlog))
             p = subprocess.Popen(cmd.split())
             time.sleep(sleeptime)
             processes.add(p)
@@ -79,6 +79,6 @@ def run_os_command(cmd):
     
     out = os.system(cmd)
     if out != 0:
-        print "ERROR"
+        print("ERROR")
         sys.exit()
     return
