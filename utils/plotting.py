@@ -14,29 +14,12 @@ def fig_save_many(f, name, types=[".png"], dpi=200):
         f.savefig(name+ext, dpi=dpi)
     return
 
-def paper_single(TW = 6.64, AR = 0.74, FF = 1., fontsize=18.0, fontst=["Times New Roman", "Computer Modern Roman", "STIXGeneral"]):
+def paper_single(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontst=["Times New Roman", "Computer Modern Roman", "STIXGeneral"]):
     '''paper_single(TW = 6.64, AR = 0.74, FF = 1.)
     TW = 3.32
     AR = 0.74
     FF = 1.
-    #mpl.rc('figure', figsize=(4.5,3.34), dpi=200)
-    mpl.rc('figure', figsize=(FF*TW, FF*TW*AR), dpi=200)
-    mpl.rc('figure.subplot', left=0.18, right=0.97, bottom=0.18, top=0.9)
-    mpl.rc('lines', linewidth=1.0, markersize=4.0)
-    mpl.rc('font', size=9.0, family="serif", serif="CM")
-    mpl.rc('xtick', labelsize='small')
-    mpl.rc('ytick', labelsize='small')
-    mpl.rc('axes', linewidth=0.75)
-    mpl.rc('legend', fontsize='small', numpoints=1, labelspacing=0.4, frameon=False) 
-    mpl.rc('text', usetex=True) 
-    mpl.rc('savefig', dpi=300)
     '''
-    #import matplotlib as mpl
-    # textwidht = 42pc = 42 * 12 pt = 42 * 12 * 1/72.27 inches
-    # columnsep = 2pc
-    # ... colwidth = 20pc
-    
-    #mpl.rc('figure', figsize=(4.5,3.34), dpi=200)
     mpl.rc('figure', figsize=(FF*TW, FF*TW*AR), dpi=100)
     mpl.rc('figure.subplot', left=0.15, right=0.95, bottom=0.15, top=0.92)
     mpl.rc('lines', linewidth=1.75, markersize=8.0, markeredgewidth=0.75)
@@ -113,20 +96,7 @@ def paper_single_mult_ax(nrows=1, ncols=1, **kwargs):
     return f, ax
     
     
-#def paper_single_ax_mjh(TW = 8, AR = 0.75, FF = 1.):
-    ##import matplotlib as mpl
-    #paper_single_mjh(TW=TW, AR=AR, FF=FF)
-    #f = plt.figure()
-    #ax = plt.subplot(111)
-    #plt.minorticks_on()
-    #ylocator6 = plt.MaxNLocator(5)
-    #xlocator6 = plt.MaxNLocator(6)
-    #ax.xaxis.set_major_locator(xlocator6)
-    #ax.yaxis.set_major_locator(ylocator6)
-    #return f, ax
-    
-def paper_single_ax(TW = 6.64, AR = 0.74, FF = 1., fontsize=18.0, fontst="CM"):
-    #import matplotlib as mpl
+def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontst="CM"):
     paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fontst=fontst)
     f = plt.figure()
     ax = plt.subplot(111)
@@ -138,7 +108,6 @@ def paper_single_ax(TW = 6.64, AR = 0.74, FF = 1., fontsize=18.0, fontst="CM"):
     return f, ax
 
 def paper_double_ax():
-    #import matplotlib as mpl
     paper_single(TW = 12)
     f = plt.figure()
     ax = plt.subplot(111)
@@ -149,27 +118,9 @@ def paper_double_ax():
     ax.yaxis.set_major_locator(ylocator6)
     return f, ax
 
-def paper_double_mult_ax(nrows=1, ncols=1, setticks=True, **kwargs):
-    #import matplotlib as mpl
+def paper_double_mult_ax(nrows=1, ncols=1, setticks=True, FF=1, TW=6.97*2, AR=0.74, **kwargs):
     paper_single()
-    #TW = 6.97
-    #AR = 0.74
-    #FF = 1.
-    #mpl.rc('figure', figsize=(FF*TW, FF*TW*AR), dpi=200)
-    #mpl.rc('figure.subplot', left=0.08, right=0.95, bottom=0.08, top=0.95)
-    #mpl.rc('font', size=12.0, family="serif", serif="CM")
-    #f = plt.figure()
-    #ax = plt.subplot(111)
-    #plt.minorticks_on()
-    #ylocator6 = plt.MaxNLocator(7)
-    #xlocator6 = plt.MaxNLocator(8)
-    #ax.xaxis.set_major_locator(xlocator6)
-    #ax.yaxis.set_major_locator(ylocator6)
     
-    
-    TW = 6.97*2
-    AR = 0.74
-    FF = 1.
     mpl.rc('figure', figsize=(FF*TW, FF*TW*AR), dpi=200)
     mpl.rc('figure.subplot', left=0.1, right=0.97, bottom=0.1, top=0.97)
     mpl.rc('font', size=24.0, family="serif", serif="CM")
@@ -201,7 +152,9 @@ def invert_ylim(ax):
     ax.set_ylim(y2,y1)
     return
 
-def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None, xtick_spacing=None, ytick_spacing=None, xtick_min_spacing=None, ytick_min_spacing=None):
+def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None, xtick_spacing=None, ytick_spacing=None, xtick_min_spacing=None, ytick_min_spacing=None, title=None):
+    if title:
+        ax.set_title(title)
     if xlabel:
         ax.set_xlabel(xlabel)
     if ylabel:
@@ -218,18 +171,6 @@ def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None, xtick_spacing
         ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(ytick_spacing))
     if ytick_min_spacing:
         ax.yaxis.set_minor_locator(mpl.ticker.MultipleLocator(ytick_min_spacing))
-    return
-
-
-def invert_ylim(ax):
-    y1, y2 = ax.get_ylim()
-    ax.set_ylim(y2, y1)
-    return
-
-
-def invert_xlim(ax):
-    x1, x2 = ax.get_xlim()
-    ax.set_xlim(x2, x1)
     return
 
 
