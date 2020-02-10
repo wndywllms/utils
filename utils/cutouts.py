@@ -198,8 +198,6 @@ args:
 kwargs:
     local_file     - name of fits file from which to make cutout
     """
-    import pyfits as pf
-    import pywcs as pw
     
     if os.path.exists(fitscut):
         if clobber:
@@ -317,8 +315,6 @@ args:
 kwargs:
     local_file     - name of fits file from which to make cutout
     """
-    import pyfits as pf
-    import pywcs as pw
     
     
     if os.path.exists(fitscut):
@@ -500,7 +496,6 @@ args:
 kwargs:
     url     - server url
     """
-    import pyfits as pf
     
     
     if os.path.exists(fitscut):
