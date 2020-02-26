@@ -3,12 +3,14 @@
 # or varius cutout servers
 
 from astroquery.skyview import SkyView
+from astroquery.ibe import Ibe
 import astropy.coordinates as coord
 import astropy.units as u
 
 from lxml import html
 import requests
 import shutil
+from time import sleep
 
 import subprocess as sub
 import numpy as np
@@ -219,7 +221,8 @@ kwargs:
     skycrd = np.array([[ra,dec,0,0]], np.float_)
 
     # Convert pixel coordinates to world coordinates
-    pixel = wcs.wcs_sky2pix(skycrd, 1)
+    #pixel = wcs.wcs_sky2pix(skycrd, 1)
+    pixel = wcs.all_world2pix(skycrd, 1)
 
     x = np.floor(pixel[0][0])
     y = np.floor(pixel[0][1])
@@ -398,6 +401,11 @@ kwargs:
     os.system( 'fitscopy %s %s' %(inps,fitscut) )
     return
 
+def get_legacy(fitsname,ra,dec,size=1000,pixscale=0.454,bands='r',ftype='fits'):
+    url = "http://legacysurvey.org/viewer/{}-cutout?ra={}&dec={}&size={}&layer=dr8&pixscale={}&bands={}".format(ftype,ra,dec,size,pixscale,bands)
+    #outname='legacy-%s-%f-%f.fits' % (bands,ra,dec)
+    download_file(url,fitsname)
+    return 
 
 def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
     '''
@@ -452,6 +460,30 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
         return -1
     os.system('rm -rf ttt')
     return fitsname
+
+
+def get_wise(ra,dec,band):
+    mission='wise'
+    dataset='allwise'
+    table='p3am_cdd'
+    successful=False
+    while not successful:
+        try:
+            results=Ibe.query_region(coord.SkyCoord(ra, dec, unit=(u.deg, u.deg), frame='icrs'),mission=mission,dataset=dataset,table=table)
+            successful=True
+        except requests.exceptions.ConnectionError:
+            print('Connection failed, retrying')
+            sleep(10)
+    
+    url = 'http://irsa.ipac.caltech.edu/ibe/data/'+mission+'/'+dataset+'/'+table+'/'
+    params = { 'coadd_id': results[results['band']==band]['coadd_id'][0],
+           'band': band }
+    params['coaddgrp'] = params['coadd_id'][:2]
+    params['coadd_ra'] = params['coadd_id'][:4]
+    path = str.format('{coaddgrp:s}/{coadd_ra:s}/{coadd_id:s}/{coadd_id:s}-w{band:1d}-int-3.fits',**params)
+    outname=path.split('/')[-1]
+    download_file(url+path,outname)
+    return outname
 
 def get_first(ra,dec):
     url="http://archive.stsci.edu/"
@@ -621,6 +653,33 @@ returns
     url = "http://irsa.ipac.caltech.edu/cgi-bin/Subimage/nph-subimage?origfile=/irsadata/SPITZER/SDWFS//images/combined_epochs/{band}_bootes.v32.fits&ra={ra:f}&dec={dec:f}&xsize={imsize:f}".format(band=band, ra=ra, dec=dec, imsize=imsize)
     
     result = cutout_from_server(fitscut, url=url)
+    return result
+
+
+def get_SDWFS_cutout_local(fitscut, ra, dec, imsize, band="I1", clobber=False):
+    """ get a fits cutout from SDWFS server
+args:
+    fitscut - name of cutout
+    ra      - degrees
+    dec     - degrees
+    imsize  - size of cutout in degrees
+kwargs
+    band    - SDWFS band
+returns
+    result  - success?
+    """
+    
+    if os.path.exists(fitscut):
+        if clobber:
+            os.system('rm '+fitscut)
+        else:
+            print('file exists and clobber is False: ',fitscut)
+            return
+        
+    #url = "http://irsa.ipac.caltech.edu/cgi-bin/Subimage/nph-subimage?origfile=/irsadata/SPITZER/SDWFS//images/combined_epochs/{band}_bootes.v32.fits&ra={ra:f}&dec={dec:f}&xsize={imsize:f}".format(band=band, ra=ra, dec=dec, imsize=imsize)
+    
+    sdwfsfile = '/net/beerze//data2/wwilliams/projects/lofar_surveys/deep/Bootes_optical/SDWFS/I2_bootes.v32.fits'
+    result = cutout_from_local_file(fitscut, ra, dec, imsize, local_file=sdwfsfile, clobber=clobber)
     return result
 
 def get_first_cutout(fitscut, ra, dec, imsize, clobber=False):
