@@ -165,7 +165,7 @@ def plot_equal(ax, col='k', **kwargs):
     ax.plot([l1,l2], [l1,l2],c=col, **kwargs)
     
     ax.set_xlim(x1,x2)
-    ax.set_xlim(y1,y2)
+    ax.set_ylim(y1,y2)
     
     return
 
