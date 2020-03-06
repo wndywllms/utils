@@ -152,6 +152,23 @@ def invert_ylim(ax):
     ax.set_ylim(y2,y1)
     return
 
+def plot_equal(ax, col='k', **kwargs):
+    '''
+    plot one-to-one line
+    '''
+    x1,x2 = ax.get_xlim()
+    y1,y2 = ax.get_ylim()
+    
+    l1 = min(x1,y1)
+    l2 = max(x2,y2)
+    
+    ax.plot([l1,l2], [l1,l2],c=col, **kwargs)
+    
+    ax.set_xlim(x1,x2)
+    ax.set_xlim(y1,y2)
+    
+    return
+
 def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None, xtick_spacing=None, ytick_spacing=None, xtick_min_spacing=None, ytick_min_spacing=None, title=None):
     if title:
         ax.set_title(title)
