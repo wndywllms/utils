@@ -134,3 +134,13 @@ def bandwidth_smearing2(delta_freq,freq,resolution,delta_Theta):
 
     return Reduction
 
+
+def check_flagged(ms):
+    ''' check_flagged(ms) check the flag fraction of a measurement set
+    from ddf-pipeline
+    '''
+    
+    import pyrap.tables as pt
+    t = pt.table(ms, readonly=True, ack=False)
+    tc = t.getcol('FLAG').flatten()
+    return float(np.sum(tc))/len(tc)
