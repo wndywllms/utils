@@ -194,3 +194,9 @@ def get_ms_freq_resolution(ms):
     
     t.close()
     return dfreq[0]*1e3, nfreqs
+
+
+def get_timerange(ms):
+    t = pt.table(ms +'/OBSERVATION', readonly=True, ack=False)
+    t.close()
+    return t.getcell('TIME_RANGE',0)
