@@ -144,3 +144,53 @@ def check_flagged(ms):
     t = pt.table(ms, readonly=True, ack=False)
     tc = t.getcol('FLAG').flatten()
     return float(np.sum(tc))/len(tc)
+
+
+def get_ms_time_resolution(ms):
+    '''
+    return timestep (in s) and ntimes
+    '''
+    import pyrap.tables as pt
+    t = pt.table(ms, readonly=True, ack=False)
+    
+    times = t.getcol('TIME')
+    t.close()
+    
+    unq_times = np.unique(times)
+    ntimes = len(unq_times)
+    unq_times = np.sort(unq_times)
+    
+    dt = np.diff(unq_times)
+    
+    
+    print ('MS {} has {} timesteps of {:.2f}s'.format(ms, ntimes, dt[0]))
+    
+    # check that all timesteps are the same
+    if not np.all(dt==dt[0]):
+        print ('Not all timesteps in ms {} are the same, returning full array of timesteps'.format(ms))
+        return dt, ntimes
+    
+    return dt[0], ntimes
+
+
+def get_ms_freq_resolution(ms):
+    '''
+    return freq (in kHz) and nfreq
+    '''
+    import pyrap.tables as pt
+    t = pt.table(ms+'::SPECTRAL_WINDOW', readonly=True, ack=False)
+    freq = t.getcol('CHAN_FREQ')[0]
+    
+    nfreqs = len(freq)
+    freq = np.sort(freq)
+    dfreq = np.diff(freq)
+    
+    print ('MS {} has {} freqsteps of {:.2f} kHz'.format(ms, nfreqs, dfreq[0]*1e3))
+    
+    # check that all timesteps are the same
+    if not np.all(dfreq==dfreq[0]):
+        print ('Not all freqsteps in ms {} are the same, returning full array of freqsteps'.format(ms))
+        return dfreq, nfreqs
+    
+    t.close()
+    return dfreq[0]*1e3, nfreqs
