@@ -169,6 +169,20 @@ def plot_equal(ax, col='k', **kwargs):
     
     return
 
+def format_log_axis10(ax, axis='both'):
+    '''
+    format a log axis as ... 0.1, 0, 1, 10 ...
+    axis should be 'x','y',or 'both'
+    default axis='both'
+    '''
+    assert axis in ['x','y','both'], 'invalid axis value'
+    import matplotlib.ticker as ticker
+    if axis in ['y','both']:
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: '{:g}'.format(y)))
+    if axis in ['x','both']:
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: '{:g}'.format(y)))
+    return
+
 def set_attrib(ax, xlabel=None, ylabel=None, xlim=None, ylim=None, xtick_spacing=None, ytick_spacing=None, xtick_min_spacing=None, ytick_min_spacing=None, title=None):
     if title:
         ax.set_title(title)
