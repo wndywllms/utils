@@ -3,15 +3,21 @@ import matplotlib as mpl
 #mpl.use('Agg')
 mpl.rc_file('~/.config/matplotlib/matplotlibrc')  # <-- the file containing your settings
 import matplotlib.pyplot as plt
+import sys
+import os
+import datetime
 
-
-def fig_save_many(f, name, types=[".png"], dpi=200):
+def fig_save_many(f, name, types=[".png"], dpi=200,metadata=None):
     if not isinstance(types, list):
         types = [types]
     for ext in types:
         if ext[0] != '.':
             ext = '.'+ext
-        f.savefig(name+ext, dpi=dpi)
+        if 'png' in ext:
+            metadata = {'Description': 'Created by '+ os.path.abspath((sys.argv[0])) +' at '+datetime.datetime.now().strftime("%c")}
+            f.savefig(name+ext, dpi=dpi, metadata=metadata)
+        else:
+            f.savefig(name+ext, dpi=dpi)
     return
 
 def paper_single(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontst=["Times New Roman", "Computer Modern Roman", "STIXGeneral"]):
