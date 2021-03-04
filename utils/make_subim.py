@@ -117,6 +117,10 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
     wn.wcs.crpix[1]=w.wcs.crpix[1]-ymin
     wn.wcs.cdelt=w.wcs.cdelt[0:2]
     try:
+        wn.wcs.cd=w.wcs.cd[0:2,0:2]
+    except AttributeError:
+        pass # cd is not present
+    try:
         wn.wcs.pc=w.wcs.pc[0:2,0:2]
     except AttributeError:
         pass # pc is not present
