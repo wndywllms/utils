@@ -3,6 +3,7 @@ import matplotlib as mpl
 #mpl.use('Agg')
 mpl.rc_file('~/.config/matplotlib/matplotlibrc')  # <-- the file containing your settings
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def fig_save_many(f, name, types=[".png"], dpi=200):
@@ -14,16 +15,26 @@ def fig_save_many(f, name, types=[".png"], dpi=200):
         f.savefig(name+ext, dpi=dpi)
     return
 
-def paper_single(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontst=["Times New Roman", "Computer Modern Roman", "STIXGeneral"]):
+def paper_single(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontf='serif', fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana']):
     '''paper_single(TW = 6.64, AR = 0.74, FF = 1.)
     TW = 3.32
     AR = 0.74
     FF = 1.
     '''
+    mpl.rcParams['font.family'] = fontf
+    if fontf == 'sans-serif':
+        mpl.rcParams['mathtext.fontset'] = 'dejavusans'
+        mpl.rc('text', usetex=False) 
+    else:
+        mpl.rcParams['mathtext.fontset'] = 'cm'
+        mpl.rc('text', usetex=True) 
+    mpl.rcParams['font.sans-serif'] = fontss
+    mpl.rcParams['font.serif'] = fonts
+    mpl.rcParams['font.size'] = fontsize
     mpl.rc('figure', figsize=(FF*TW, FF*TW*AR), dpi=100)
     mpl.rc('figure.subplot', left=0.15, right=0.95, bottom=0.15, top=0.92)
     mpl.rc('lines', linewidth=1.75, markersize=8.0, markeredgewidth=0.75)
-    mpl.rc('font', size=fontsize, family="serif", serif=fontst)
+    #mpl.rc('font', size=fontsize, family=fontf, serif=fontst, sans-serif=fontsts)
     mpl.rc('xtick', labelsize='small')
     mpl.rc('ytick', labelsize='small')
     mpl.rc('xtick.major', width=1.0, size=8)
@@ -32,7 +43,6 @@ def paper_single(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontst=["Times New Roma
     mpl.rc('ytick.minor', width=1.0, size=4)
     mpl.rc('axes', linewidth=1.5)
     mpl.rc('legend', fontsize='small', numpoints=1, labelspacing=0.4, frameon=False) 
-    mpl.rc('text', usetex=True) 
     mpl.rc('savefig', dpi=300)
     
     
@@ -96,8 +106,8 @@ def paper_single_mult_ax(nrows=1, ncols=1, **kwargs):
     return f, ax
     
     
-def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontst="CM"):
-    paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fontst=fontst)
+def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana'], fontf='serif'):
+    paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fonts=fonts, fontss=fontss, fontf=fontf)
     f = plt.figure()
     ax = plt.subplot(111)
     plt.minorticks_on()
@@ -140,6 +150,40 @@ def paper_double_mult_ax(nrows=1, ncols=1, setticks=True, FF=1, TW=6.97*2, AR=0.
                 axcol.xaxis.set_major_locator(xlocator6)
                 axcol.yaxis.set_major_locator(ylocator6)
     return f, ax
+
+
+def plot_np_hist(ax, xbins, ydata, **kwargs):
+    '''
+    plot output of np.histogram with matplotlib
+    ax - axes to plot into
+    xbins - bin edges (dimension N+1)
+    ydata - bin counts (dimension N)
+    **kwargs - matplotlib.pyplot.plot arguments
+    '''
+    left,right = xbins[:-1],xbins[1:]
+    X = np.array([left,right]).T.flatten()
+    Y = np.array([ydata,ydata]).T.flatten()
+    ax.plot(X,Y,**kwargs)
+    return 
+
+def add_colorbar(f,ax,c,label='',side='right',size='5%',pad=0.05):
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes(side, size=size, pad=pad)
+    cbar=f.colorbar(c, cax=cax, orientation='vertical')
+    if label != '':
+        cbar.set_label(label)
+    return
+
+
+    
+
+def invert_lim(ax,axis):
+    assert axis.lower() in ['x','y'] , "Axis should be 'x' or 'y'"
+    if axis.lower() =='x':
+        invert_xlim(ax)
+    else:
+        invert_ylim(ax)
+    return
 
 def invert_xlim(ax):
     x1,x2 = ax.get_xlim()

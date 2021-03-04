@@ -51,6 +51,33 @@ def download_file(url,outname):
         del response
         
 
+def get_pixel_values(ra,dec,image):
+  head = pf.getheader(image)
+  data = pf.getdata(image)
+  
+  # Parse the WCS keywords in the primary HDU
+  wcs = pw.WCS(head)
+
+  # Some pixel coordinates of interest.
+  #skycrd = np.array([ra,dec])
+  if wcs.naxis ==4:
+    x,y,_,_ = wcs.all_world2pix(ra,dec,0*ra,0*ra, 1)
+    x=np.array(np.round(x,0), dtype=int)
+    y=np.array(np.round(y,0), dtype=int)
+    if len(data.shape) ==4:
+        values = data[0,0,x,y]
+    else:
+        values = data[x,y]
+  elif all_world2pix ==2 :
+    x,y,_,_ = wcs.all_world2pix(ra,dec, 1)
+    x=np.array(np.round(x,0), dtype=int)
+    y=np.array(np.round(y,0), dtype=int)
+    values = data[x,y]
+      
+  return values
+
+
+
 def plot_image(fits,ax, rms=np.nan, F=np.nan, cont=None, contcol='r', stretch='sqrt'):
   ax.set_frame_color('k')
   ax.set_tick_color('k')
