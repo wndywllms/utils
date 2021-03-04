@@ -444,7 +444,7 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
             os.system('rm '+fitsname)
         else:
             print('file exists and clobber is False: ',fitsname)
-            return
+            return fitsname
         
     s = int(imsize*3600.*4)  #arcsec to pix seems to be 4pix=1arcsec
     
