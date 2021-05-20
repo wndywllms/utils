@@ -77,7 +77,7 @@ def show_overlay(lofarhdu,opthdu,ra,dec,size,firsthdu=None,vlasshdu=None,rms_use
     lofarhdu: the LOFAR cutout to use for contours
     opthdu: the optical image to use (may be 2D image or RGB cube)
     ra, dec: position to use, in degrees
-    size: size in arcseconds
+    size: size in degrees
     firsthdu: FIRST cutout to use for contours or None if not required
     vlasshdu: VLASS cutout to use for contours or None if not required
     rms_use: Use a particular LOFAR rms or None to compute it from cutout

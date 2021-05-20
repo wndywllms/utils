@@ -157,6 +157,9 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
     return hdulist
 
 def extract_subim(filename,ra,dec,size,size2=None,hduid=0,verbose=True,cubemode=False):
+    '''
+    size in deg
+    '''
     if verbose:
         print('Opening',filename)
     if size2 is None:
