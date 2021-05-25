@@ -112,10 +112,10 @@ def paper_single_mult_ax(nrows=1, ncols=1, **kwargs):
     return f, ax
     
     
-def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana'], fontf='serif'):
+def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana'], fontf='serif', projection=None):
     paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fonts=fonts, fontss=fontss, fontf=fontf)
     f = plt.figure()
-    ax = plt.subplot(111)
+    ax = plt.subplot(111, projection=None)
     plt.minorticks_on()
     ylocator6 = plt.MaxNLocator(5)
     xlocator6 = plt.MaxNLocator(6)
