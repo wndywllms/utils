@@ -36,7 +36,7 @@ def find_noise_area(hdu,ra,dec,size,channel=0,true_max=False,debug=False):
     else:
         channels,ysize,xsize=hdu[0].data.shape
         cube=True
-    w=WCS(hdu[0].header)
+    w=pw.WCS(hdu[0].header)
     ras=[ra-size,ra-size,ra+size,ra+size]
     decs=[dec-size,dec+size,dec-size,dec+size]
     xv=[]
