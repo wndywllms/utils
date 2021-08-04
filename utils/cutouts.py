@@ -591,8 +591,13 @@ def get_first(ra,dec):
     return outname
 
 
-def get_nvss(ra,dec,size=1000):
+def get_nvss(ra,dec,size=1000,overwrite=True):
     # uses skyview
+    filename='NVSS-'+coords.to_string('hmsdms').replace(' ','')+'.fits'
+    if os.isfile(filename) and overwrite:
+        os.system('rm '+filename)
+    else:
+        return filename
     coords=coord.SkyCoord(ra, dec, unit=(u.deg, u.deg))
     paths = SkyView.get_images(position=coords.to_string('hmsdms'),survey='NVSS',width=size*u.arcsec)
     hdu = paths[0]
@@ -600,7 +605,6 @@ def get_nvss(ra,dec,size=1000):
     hdu[0].header['BMIN']=45.0/3600.0
     hdu[0].header['BPA']=0
     hdu[0].header['RESTFREQ']=1.4e9
-    filename='NVSS-'+coords.to_string('hmsdms').replace(' ','')+'.fits'
     hdu.writeto(filename)
     return filename
 
