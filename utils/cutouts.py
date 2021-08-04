@@ -25,6 +25,9 @@ VERBOSE = 10
 clobber=True
 
 def find_noise_area(hdu,ra,dec,size,channel=0,true_max=False,debug=False):
+    '''
+    from https://github.com/mhardcastle/lotss-catalogue/blob/master/utils/overlay.py
+    '''
     # ra, dec, size in degrees
     size/=1.5
     if len(hdu[0].data.shape)==2:
