@@ -24,6 +24,14 @@ from .sky_util import *
 VERBOSE = 10
 clobber=True
 
+def find_noise(a):
+    b=a.flatten()
+    for i in range(10):
+        m=np.nanmean(b)
+        s=np.nanstd(b)
+        b=b[b<(m+5.0*s)]
+    return m,s
+
 def find_noise_area(hdu,ra,dec,size,channel=0,true_max=False,debug=False):
     '''
     from https://github.com/mhardcastle/lotss-catalogue/blob/master/utils/overlay.py
