@@ -24,6 +24,52 @@ from .sky_util import *
 VERBOSE = 10
 clobber=True
 
+def find_noise_area(hdu,ra,dec,size,channel=0,true_max=False,debug=False):
+    # ra, dec, size in degrees
+    size/=1.5
+    if len(hdu[0].data.shape)==2:
+        cube=False
+        ysize,xsize=hdu[0].data.shape
+    else:
+        channels,ysize,xsize=hdu[0].data.shape
+        cube=True
+    w=WCS(hdu[0].header)
+    ras=[ra-size,ra-size,ra+size,ra+size]
+    decs=[dec-size,dec+size,dec-size,dec+size]
+    xv=[]
+    yv=[]
+    for r,d in zip(ras,decs):
+        if cube:
+            x,y,c=w.wcs_world2pix(r,d,0,0)
+        else:
+            x,y=w.wcs_world2pix(r,d,0)
+        xv.append(x)
+        yv.append(y)
+    if debug: print xv,yv
+    xmin=int(min(xv))
+    if xmin<0: xmin=0
+    xmax=int(max(xv))
+    if xmax>=xsize: xmax=xsize-1
+    ymin=int(min(yv))
+    if ymin<0: ymin=0
+    ymax=int(max(yv))
+    if ymax>=ysize: ymax=ysize-1
+    if debug: print xmin,xmax,ymin,ymax
+    if cube:
+        subim=hdu[0].data[channel,ymin:ymax,xmin:xmax]
+    else:
+        subim=hdu[0].data[ymin:ymax,xmin:xmax]
+    if debug: subim.shape
+    mean,noise=find_noise(subim)
+    if true_max:
+        vmax=np.nanmax(subim)
+    else:
+        for i in range(5,0,-1):
+            vmax=np.nanmedian(subim[subim>(mean+i*noise)])
+            if not(np.isnan(vmax)):
+                break
+    return mean,noise,vmax
+
 def download_file(url,outname):
     if os.path.isfile(outname):
         print('File',outname,'already exists, skipping')
