@@ -48,7 +48,7 @@ def find_noise_area(hdu,ra,dec,size,channel=0,true_max=False,debug=False):
             x,y=w.wcs_world2pix(r,d,0)
         xv.append(x)
         yv.append(y)
-    if debug: print xv,yv
+    if debug: print (xv,yv)
     xmin=int(min(xv))
     if xmin<0: xmin=0
     xmax=int(max(xv))
@@ -57,7 +57,7 @@ def find_noise_area(hdu,ra,dec,size,channel=0,true_max=False,debug=False):
     if ymin<0: ymin=0
     ymax=int(max(yv))
     if ymax>=ysize: ymax=ysize-1
-    if debug: print xmin,xmax,ymin,ymax
+    if debug: print (xmin,xmax,ymin,ymax)
     if cube:
         subim=hdu[0].data[channel,ymin:ymax,xmin:xmax]
     else:
