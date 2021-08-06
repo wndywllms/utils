@@ -595,11 +595,12 @@ def get_nvss(ra,dec,size=1000,overwrite=True):
     # uses skyview
     coords=coord.SkyCoord(ra, dec, unit=(u.deg, u.deg))
     filename='NVSS-'+coords.to_string('hmsdms').replace(' ','')+'.fits'
-    if os.path.isfile(filename) and overwrite:
-        print('removing '+filename)
-        os.system('rm '+filename)
-    else:
-        return filename
+    if os.path.isfile(filename):
+        if overwrite:
+            print('removing '+filename)
+            os.system('rm '+filename)
+        else:
+            return filename
     paths = SkyView.get_images(position=coords.to_string('hmsdms'),survey='NVSS',width=size*u.arcsec)
     hdu = paths[0]
     hdu[0].header['BMAJ']=45.0/3600.0
