@@ -596,6 +596,7 @@ def get_nvss(ra,dec,size=1000,overwrite=True):
     coords=coord.SkyCoord(ra, dec, unit=(u.deg, u.deg))
     filename='NVSS-'+coords.to_string('hmsdms').replace(' ','')+'.fits'
     if os.path.isfile(filename) and overwrite:
+        print('removing '+filename)
         os.system('rm '+filename)
     else:
         return filename
