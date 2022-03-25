@@ -2,8 +2,6 @@
 # using just a fits file
 # or varius cutout servers
 
-from astroquery.skyview import SkyView
-from astroquery.ibe import Ibe
 import astropy.coordinates as coord
 import astropy.units as u
 
@@ -109,29 +107,35 @@ def download_file(url,outname):
         
 
 def get_pixel_values(ra,dec,image):
-  head = pf.getheader(image)
-  data = pf.getdata(image)
-  
-  # Parse the WCS keywords in the primary HDU
-  wcs = pw.WCS(head)
+    head = pf.getheader(image)
+    data = pf.getdata(image)
 
-  # Some pixel coordinates of interest.
-  #skycrd = np.array([ra,dec])
-  if wcs.naxis ==4:
-    x,y,_,_ = wcs.all_world2pix(ra,dec,0*ra,0*ra, 1)
-    x=np.array(np.round(x,0), dtype=int)
-    y=np.array(np.round(y,0), dtype=int)
-    if len(data.shape) ==4:
-        values = data[0,0,x,y]
-    else:
-        values = data[x,y]
-  elif all_world2pix ==2 :
-    x,y,_,_ = wcs.all_world2pix(ra,dec, 1)
-    x=np.array(np.round(x,0), dtype=int)
-    y=np.array(np.round(y,0), dtype=int)
-    values = data[x,y]
+    # Parse the WCS keywords in the primary HDU
+    wcs = pw.WCS(head)
+
+    naxis = wcs.naxis
+
+    values = np.nan*np.ones(len(ra))
+    # Some pixel coordinates of interest.
+    #skycrd = np.array([ra,dec])
+    if naxis ==4:
+        x,y,_,_ = wcs.all_world2pix(ra,dec,0*ra,0*ra, 1)
+        x=np.array(np.round(x,0), dtype=int)
+        y=np.array(np.round(y,0), dtype=int)
+        if len(data.shape) ==4:
+            values = data[0,0,x,y]
+        else:
+            values = data[x,y]
+    elif naxis ==2 :
+        x,y = wcs.all_world2pix(ra,dec, 1)
+        x=np.array(np.round(x,0), dtype=int)
+        y=np.array(np.round(y,0), dtype=int)
+        
+        nx,ny = data.shape
+        m = (x>=0) & (x<nx) & (y>=0) & (y<ny)
+        values[m] = data[x[m],y[m]]
       
-  return values
+    return values
 
 
 
@@ -547,6 +551,9 @@ def download_panstarrs(fitsname,ra,dec,f='i',imsize=0.08, clobber=False):
 
 
 def get_wise(ra,dec,band):
+    print('importing Ibe... this could hang..')
+    from astroquery.ibe import Ibe
+
     mission='wise'
     dataset='allwise'
     table='p3am_cdd'
@@ -593,6 +600,9 @@ def get_first(ra,dec):
 
 def get_nvss(ra,dec,size=1000,overwrite=True):
     # uses skyview
+    print('importing skyview ... this could hang...')
+    from astroquery.skyview import SkyView
+
     coords=coord.SkyCoord(ra, dec, unit=(u.deg, u.deg))
     filename='NVSS-'+coords.to_string('hmsdms').replace(' ','')+'.fits'
     if os.path.isfile(filename):
@@ -794,7 +804,7 @@ returns
     sdec = dec_to_str( dec )
     imsize = imsize * 60.
     
-    url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
+    url = f"third.ucllnl.org/cgi-bin/firstimage?RA={sra}&Dec={sdec}&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1"
     
     print(url)
     result = cutout_from_server(fitscut, url=url)
@@ -815,7 +825,7 @@ returns
     sdec = dec_to_str( dec )
     imsize = imsize * 60.
     
-    url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
+    url = f"third.ucllnl.org/cgi-bin/firstimage?RA={ra}&Dec={dec}&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1"
     
     print(url)
     result = cutout_from_server(fitscut, url=url)
