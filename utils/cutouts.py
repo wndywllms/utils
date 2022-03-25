@@ -804,7 +804,7 @@ returns
     sdec = dec_to_str( dec )
     imsize = imsize * 60.
     
-    url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
+    url = f"third.ucllnl.org/cgi-bin/firstimage?RA={sra}&Dec={sdec}&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1"
     
     print(url)
     result = cutout_from_server(fitscut, url=url)
@@ -825,7 +825,7 @@ returns
     sdec = dec_to_str( dec )
     imsize = imsize * 60.
     
-    url = "third.ucllnl.org/cgi-bin/firstimage?RA={ra} {dec}&Dec=&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1".format(ra=sra, dec=sdec, imsize=imsize)
+    url = f"third.ucllnl.org/cgi-bin/firstimage?RA={ra}&Dec={dec}&Equinox=J2000&ImageSize={imsize:.1f}&MaxInt=10&FITS=1&Download=1"
     
     print(url)
     result = cutout_from_server(fitscut, url=url)
