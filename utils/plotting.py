@@ -1,11 +1,13 @@
+import sys
+import os
 import numpy as np
 import matplotlib as mpl
 #mpl.use('Agg')
-mpl.rc_file('~/.config/matplotlib/matplotlibrc')  # <-- the file containing your settings
+mplconfig = '~/.config/matplotlib/matplotlibrc'
+if os.system.isfile(mplconfig):
+    mpl.rc_file(mplconfig)  # <-- the file containing your settings
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import sys
-import os
 import datetime
 
 def fig_save_many(f, name, types=[".png"], dpi=200,metadata=None):
@@ -123,10 +125,10 @@ def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New R
     ax.yaxis.set_major_locator(ylocator6)
     return f, ax
 
-def paper_double_ax():
-    paper_single(TW = 12)
+def paper_double_ax(TW=12, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana'], fontf='serif', projection=None):
+    paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fonts=fonts, fontss=fontss, fontf=fontf)
     f = plt.figure()
-    ax = plt.subplot(111)
+    ax = plt.subplot(111, projection=projection)
     plt.minorticks_on()
     ylocator6 = plt.MaxNLocator(5)
     xlocator6 = plt.MaxNLocator(6)
