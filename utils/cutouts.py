@@ -600,6 +600,8 @@ def get_first(ra,dec):
 
 def get_nvss(ra,dec,size=1000,overwrite=True):
     # uses skyview
+    # if this is failing with 404 not found
+    # rm ~/.astropy/cache/astroquery/SkyView/*
     print('importing skyview ... this could hang...')
     from astroquery.skyview import SkyView
 
