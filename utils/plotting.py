@@ -3,9 +3,9 @@ import os
 import numpy as np
 import matplotlib as mpl
 #mpl.use('Agg')
-mplconfig = '~/.config/matplotlib/matplotlibrc'
-if os.system.isfile(mplconfig):
-    mpl.rc_file(mplconfig)  # <-- the file containing your settings
+#mplconfig = '~/.config/matplotlib/matplotlibrc'
+#if os.system.isfile(mplconfig):
+    #mpl.rc_file(mplconfig)  # <-- the file containing your settings
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import datetime
