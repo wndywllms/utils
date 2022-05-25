@@ -122,10 +122,12 @@ def get_pixel_values(ra,dec,image):
         x,y,_,_ = wcs.all_world2pix(ra,dec,0*ra,0*ra, 1)
         x=np.array(np.round(x,0), dtype=int)
         y=np.array(np.round(y,0), dtype=int)
+        _,_,nx,ny = wcs.array_shape
+        m = (x>=0) & (x <nx) & (y>=0) & (y<ny)
         if len(data.shape) ==4:
-            values = data[0,0,x,y]
+            values[m] = data[0,0,x[m],y[m]]
         else:
-            values = data[x,y]
+            values[m] = data[x[m],y[m]]
     elif naxis ==2 :
         x,y = wcs.all_world2pix(ra,dec, 1)
         x=np.array(np.round(x,0), dtype=int)
