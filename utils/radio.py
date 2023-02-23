@@ -217,7 +217,7 @@ def get_uvw(ms,unit='m'):
         uvw = t.getcol('UVW')
         wavelength = 2.99e8 / np.mean(t.SPECTRAL_WINDOW[0]['CHAN_FREQ'])
         #uvw = np.linalg.norm(uvw, axis=1)
-        if unit = 'lambda':
+        if unit == 'lambda':
             uvw = uvw /wavelength
         return uvw
         
