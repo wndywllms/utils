@@ -1,4 +1,13 @@
 import numpy as np
+import casacore.tables as pt
+import casacore.quanta as qa
+import casacore.measures as pm
+
+
+from astropy.coordinates import AltAz, EarthLocation, SkyCoord
+from astropy.time import Time
+import astropy.units as u
+
 
 def get_optimum_size(size):
     """
@@ -27,18 +36,18 @@ def get_optimum_size(size):
             return [1]
         c=2
         while 1:
-                if (lastresult == 1) or (c > sqlast):
+            if (lastresult == 1) or (c > sqlast):
+                break
+            sqlast=int(np.sqrt(lastresult))+1
+            while 1:
+                if(c > sqlast):
+                    c=lastresult
                     break
-                sqlast=int(np.sqrt(lastresult))+1
-                while 1:
-                    if(c > sqlast):
-                        c=lastresult
-                        break
-                    if lastresult % c == 0:
-                        break
-                    c += 1
-                factors.append(c)
-                lastresult /= c
+                if lastresult % c == 0:
+                    break
+                c += 1
+            factors.append(c)
+            lastresult /= c
         if (factors==[]): factors=[n]
         return  np.unique(factors).tolist() if douniq else factors
 
@@ -95,7 +104,7 @@ def time_smearing2(delta_T,resolution,delta_Theta):
 def bandwidth_smearing(freq,resolution,delta_Theta):
 
     #http://www.cv.nrao.edu/course/astr534/Interferometers1.html
-    # Output and input units are equal 
+    # Output and input units are equal
     # Condition that delta_Theta * delta_freq << Freq * resolution
     # where delta_Theta is the offset from the pointing centre and delta_freq is the bandwidth smoothing.
 
@@ -121,7 +130,7 @@ def bandwidth_smearing(freq,resolution,delta_Theta):
 def bandwidth_smearing2(delta_freq,freq,resolution,delta_Theta):
     '''
     #http://www.cv.nrao.edu/course/astr534/Interferometers1.html
-    # Output and input units are equal 
+    # Output and input units are equal
     # Condition that delta_Theta * delta_freq << Freq * resolution
     # where delta_Theta is the offset from the pointing centre and delta_freq is the bandwidth smoothing.
 
@@ -179,7 +188,6 @@ def get_ms_freq_resolution(ms):
     '''
     return freq (in kHz) and nfreq
     '''
-    import pyrap.tables as pt
     t = pt.table(ms+'::SPECTRAL_WINDOW', readonly=True, ack=False)
     freq = t.getcol('CHAN_FREQ')[0]
     
@@ -202,3 +210,109 @@ def get_timerange(ms):
     t = pt.table(ms +'/OBSERVATION', readonly=True, ack=False)
     t.close()
     return t.getcell('TIME_RANGE',0)
+
+
+def get_uvw(ms,unit='m'):
+    with pt.table(ms, ack = False) as t:
+        uvw = t.getcol('UVW')
+        wavelength = 2.99e8 / np.mean(t.SPECTRAL_WINDOW[0]['CHAN_FREQ'])
+        #uvw = np.linalg.norm(uvw, axis=1)
+        if unit = 'lambda':
+            uvw = uvw /wavelength
+        return uvw
+        
+        
+def get_pntg(ms):
+    """
+    Get phase centre
+    """
+    field_no = 0
+    ant_no   = 0
+    with pt.table(ms + "/FIELD", ack = False) as field_table:
+        direction = field_table.getcol("PHASE_DIR")
+    RA        = direction[ant_no, field_no, 0]
+    Dec       = direction[ant_no, field_no, 1]
+
+    if (RA < 0):
+        RA += 2 * np.pi
+    
+    return (RA,Dec)
+    
+def get_antpos(ms):
+    me = pm.measures()
+    with pt.table(ms + "/ANTENNA", ack = False) as ant_table:
+        pos = ant_table.getcol('POSITION')
+        x = qa.quantity( pos[:,0], 'm' )
+        y = qa.quantity( pos[:,1], 'm' )
+        z = qa.quantity( pos[:,2], 'm' )
+        position =  me.position( 'wgs84', x, y, z )
+    return position
+    
+def get_elev1(ms):
+    me = pm.measures()
+    pos = get_antpos(ms)
+    me.doframe(pos)
+    
+    # Get the first pointing of the first antenna
+    with  pt.table(ms + '/FIELD', ack=False) as field_table:
+        field_no = 0
+        phase_dir = field_table.getcol('PHASE_DIR')
+        ra = phase_dir[ 0, field_no, 0 ]
+        if ra<0: ra += 2*numpy.pi
+        dec = phase_dir[ 0, field_no, 1 ]
+    # Get a ordered list of unique time stamps from the measurement set
+    #time_table = pt.taql('select TIME from $1 orderby distinct TIME', tables=[ms])
+    with pt.table(ms, readonly=True, ack=False) as t:
+        time = t.getcol('TIME')
+    
+    time1 = time/3600.0
+    time1 = time1 - np.floor(time1[0]/24)*24
+    ra_qa  = qa.quantity( ra, 'rad' )
+    dec_qa = qa.quantity( dec, 'rad' )
+    pointing =  me.direction('j2000', ra_qa, dec_qa)
+    t = qa.quantity(time[0], 's')
+    t1 = me.epoch('utc', t)
+    me.doframe(t1)
+    # Loop through all time stamps and calculate the elevation of the pointing
+    elevation = []
+    for t in time:
+        t_qa = qa.quantity(t, 's')
+        t1 = me.epoch('utc', t_qa)
+        me.doframe(t1)
+        a = me.measure(pointing, 'azel')
+        el = a['m1']
+        elevation.append(el['value']/np.pi*180)
+    elevation = np.array(elevation)
+    return time1, elevation
+
+
+def get_elevation(ms):
+    ''' get time and elevation the astropy way
+    input:
+      ms - measurement set name
+    returns:
+      time - astropy.time.core.Time
+      elevation - astropy.coordinates.angles.Latitude'''
+    with pt.table(ms, readonly=True, ack=False) as t:
+        time = t.getcol('TIME')
+        time = np.unique(time)
+        atime=Time(time*u.s,format='mjd',scale='utc')
+    with pt.table(ms + '/ANTENNA', ack=False) as ant_table:
+        pos = ant_table.getcol('POSITION')
+        ant_id = 0
+        x =  pos[ant_id,0]
+        y =  pos[ant_id,1]
+        z =  pos[ant_id,2]
+        array_position = EarthLocation(x=x*u.m, y=y*u.m, z=z*u.m) # ellipsoid='wgs84')
+    with  pt.table(ms + '/FIELD', ack=False) as field_table:
+        field_id = 0
+        phase_dir = field_table.getcol('PHASE_DIR')
+        ra = phase_dir[ 0, field_id, 0 ]
+        if ra<0: ra += 2*numpy.pi
+        dec = phase_dir[ 0, field_id, 1 ]
+        aphase_dir = SkyCoord(ra,dec,unit=u.rad)
+        
+    
+    aphase_dir_altaz = aphase_dir.transform_to(AltAz(obstime=atime,location=array_position))
+    return atime, aphase_dir_altaz.alt
+
