@@ -152,7 +152,7 @@ def flatten(f,ra,dec,x,y,size,size2=None,hduid=0,channel=0,freqaxis=3,verbose=Tr
         print(slice)
 
     header['HISTORY'] = 'flatten'
-    hdu=fits.PrimaryHDU(f[hduid].data[slice],header)
+    hdu=fits.PrimaryHDU(f[hduid].data[tuple(slice)],header)
     copy=('EQUINOX','EPOCH','BMAJ','BMIN','BPA')
     for k in copy:
         r=f[hduid].header.get(k)

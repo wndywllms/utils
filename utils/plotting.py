@@ -54,6 +54,10 @@ def paper_single(TW=6.64, AR=0.74, FF=1., fontsize=16.0, fontf='serif', fonts=["
     mpl.rc('savefig', dpi=300)
     
     
+def paper_double(TW=13.28, AR=0.74, FF=1., fontsize=16.0, fontf='serif', fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana']):
+    paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fontf=fontf, fonts=fonts, fontss=fontss)
+    return
+    
 #def paper_single_mjh(TW = 8.0, AR = 0.75, FF = 1.):
     #'''paper_single(TW = 6.64, AR = 0.74, FF = 1.)
     #TW = 3.32
@@ -123,7 +127,11 @@ def paper_single_ax(TW=6.64, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New R
     xlocator6 = plt.MaxNLocator(6)
     ax.xaxis.set_major_locator(xlocator6)
     ax.yaxis.set_major_locator(ylocator6)
+    ax.tick_params(top=True, right=True)
     return f, ax
+    
+def f_ax():
+    return paper_single_ax()
 
 def paper_double_ax(TW=12, AR=0.74, FF=1., fontsize=16.0,  fonts=["Times New Roman", "Computer Modern Roman", "STIXGeneral"], fontss=['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana'], fontf='serif', projection=None):
     paper_single(TW=TW, AR=AR, FF=FF, fontsize=fontsize, fonts=fonts, fontss=fontss, fontf=fontf)
