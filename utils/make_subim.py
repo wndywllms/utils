@@ -201,7 +201,8 @@ def extract_and_save(filename,ra,dec,size,size2=None,outname='cutout.fits',cubem
 if __name__=='__main__':
     filename=sys.argv[1]
     size=float(sys.argv[2])
-    if len(sys.argv)==5:
+    print(filename,size, len(sys.argv))
+    if len(sys.argv)==6:
         try:
             ra=float(sys.argv[3])
             dec=float(sys.argv[4])
@@ -213,7 +214,7 @@ if __name__=='__main__':
             ra=float(c.ra.degree)
             dec=float(c.dec.degree)
             print(ra,dec)
-        extract_and_save(filename,ra,dec,size)
+        extract_and_save(filename,ra,dec,size,outname=sys.argv[5])
     elif len(sys.argv)==4:
         s=sys.argv[3][4:]
         coord=s[0:2]+':'+s[2:4]+':'+s[4:9]+' '+s[9:12]+':'+s[12:14]+':'+s[14:]
@@ -222,7 +223,7 @@ if __name__=='__main__':
         dec=sc.dec.value
         print('Parsed coordinates to ra=%f, dec=%f' % (ra,dec))
         name=sys.argv[1]
-        extract_and_save(filename,ra,dec,size)
+        extract_and_save(filename,ra,dec,size,outname=sys.argv[5])
     else:
-        print('Call: filename size RA DEC _OR_ filename size ILTname.')
+        print('Call: filename size RA DEC cutname _OR_ filename size ILTname.')
 

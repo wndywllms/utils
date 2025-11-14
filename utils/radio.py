@@ -7,6 +7,7 @@ import casacore.measures as pm
 from astropy.coordinates import AltAz, EarthLocation, SkyCoord
 from astropy.time import Time
 import astropy.units as u
+import astropy.constants as C
 
 
 def get_optimum_size(size):
@@ -68,6 +69,30 @@ def get_optimum_size(size):
     return newlarge
 
 
+def get_resolution(nus,Bmax,alp=1.):
+    lam = C.c/nus
+    R = alp*lam/Bmax
+    R = (R.decompose()*u.rad).to(u.arcsec)
+    return R
+
+def get_fwhm(nus,D,alp=1.):
+    lam = C.c/nus
+    R = alp*lam/D
+    R = (R.decompose()*u.rad).to(u.deg)
+    return R
+    
+    
+def get_fov(nus,D,alp=1.):
+    '''area coverd by >50% beam power
+    '''
+    return np.pi*(get_fwhm(nus,D,alp)/2)**2
+    
+def nu_to_lam(nus):
+    lams = C.c/nus
+    lams = lams.decompose().to(u.m)
+    return lams
+    
+    
 
 
 def time_smearing(resolution,delta_Theta):
@@ -93,11 +118,11 @@ def time_smearing2(delta_T,resolution,delta_Theta):
     #http://www.cv.nrao.edu/course/astr534/Interferometers1.html
     # output and input units are equal
     # Condition that delta_Theta * delta_T << 1.37E4 * Resolution
-    # where delta_Theta is the angular radius of the image and delta_T is the time smoothing.
+    # where delta_Theta is the angular radius of the image and delta_T is the time smoothing (in seconds?).
     # Time average smearing amplitude loss in http://adsabs.harvard.edu/full/1989ASPC....6..247B
 
     # Given resolution and field of view (delta_theta) this returns a condition on the time smearing at the correlator
-    Reduction = 1-1.22E-9*(delta_Theta/resolution)**2.0 * delta_T**2.0
+    Reduction = 1-1.22E-9*((delta_Theta/resolution).decompose())**2.0 * ((delta_T/(1*u.s)).decompose())**2.0
 
     return Reduction
     
@@ -137,9 +162,10 @@ def bandwidth_smearing2(delta_freq,freq,resolution,delta_Theta):
     # Given resolution, freq and offset this gives the condition for the delta_freq
     '''
     import scipy.special
+    
 
 
-    beta = (delta_freq/freq) * (delta_Theta/resolution)
+    beta = (delta_freq/freq).decompose() * (delta_Theta/resolution).decompose()
     gamma = 2*(np.log(2)**0.5)
     Reduction = ((np.pi**0.5)/(gamma * beta)) * (scipy.special.erf(beta*gamma/2.0))
 
@@ -315,4 +341,99 @@ def get_elevation(ms):
     
     aphase_dir_altaz = aphase_dir.transform_to(AltAz(obstime=atime,location=array_position))
     return atime, aphase_dir_altaz.alt
+
+
+
+def get_obs(ms):
+    with pt.table(ms + '/OBSERVATION', ack=False) as t:
+        obsid =  int(t.getcell("LOFAR_OBSERVATION_ID", 0))
+        pathFieldTable = ms + "/FIELD"
+        nameField = (pt.taql("select NAME from $pathFieldTable")).getcol("NAME")[0]
+        print("%s: Observation field: %s" % (ms, nameField))
+        print("%s: Observation ID %s" % (ms, obsid))
+
+def get_timestep(ms):
+    with pt.table(ms, ack = False) as t:
+        times = sorted(set(t.getcol('TIME')))
+    print("%s: Time step %i seconds (total timesteps: %i)." % (ms, times[1]-times[0], len(times)))
+    time = Time( times[0]/86400, format='mjd')
+    print("%s: Starting time %s" % (ms, str(time.iso)))
+
+def get_freq(ms):
+    """
+    Get chan frequencies in Hz
+    """
+    with pt.table(ms + "/SPECTRAL_WINDOW", ack = False) as t:
+        freqs = t.getcol("CHAN_FREQ")[0] * 1e-6 # MHz
+        nchan = t.getcol("NUM_CHAN")[0]
+        chan_bandwidth = t.getcol("CHAN_WIDTH")[0][0] * 1e-6 # MHz
+    min_freq = min(freqs-chan_bandwidth/2.)
+    max_freq = max(freqs+chan_bandwidth/2.)
+    mean_freq = np.mean(freqs)
+    bandwidth = max_freq-min_freq
+    print("%s: Freq range: %f MHz - %f MHz (bandwidth: %f MHz, mean freq: %f MHz)" % (ms, min_freq, max_freq, bandwidth, mean_freq))
+    print("%s: Channels: %i ch (bandwidth: %f MHz)" % (ms, nchan, chan_bandwidth) )
+
+def get_uvw(ms):
+    with pt.table(ms, ack = False) as t:
+        uvw = t.getcol('UVW')
+        wavelength = 2.99e8 / np.mean(t.SPECTRAL_WINDOW[0]['CHAN_FREQ'])
+        uvw = np.linalg.norm(uvw, axis=1)
+        minuv, maxuv = uvw.min(), uvw.max()
+        print(f"%s: uv-range %.0f m - %.0f m" % (ms, minuv, maxuv))
+        print(f"%s: uv-range %.0f lambda - %.0f lambda" % (ms, minuv/wavelength, maxuv/wavelength))
+
+
+ 
+
+    #print("%s: Phase centre: %f, %f (deg)" % (ms, np.degrees(RA), np.degrees(Dec)))
+
+    with pt.table(ms+'/FIELD', readonly=True, ack=False) as t:
+        code = t.getcell('CODE',0)
+    if code == '':
+        with pt.table(ms+'/OBSERVATION', readonly=True, ack=False) as t:
+            try:
+                code = t.getcell('LOFAR_TARGET',0)[0]
+            except:
+                code = 'N/A'
+    code = code.lower().replace(' ','_')
+    print("%s: Field: %s" % (ms, code))
+
+def get_cols(ms):
+    """
+    get non-default colummns
+    """
+    with pt.table(ms, ack = False) as table:
+        colnames = table.colnames()
+
+    default_colnames = ['UVW','FLAG_CATEGORY','WEIGHT','SIGMA','ANTENNA1','ANTENNA2','ARRAY_ID','DATA_DESC_ID','EXPOSURE',
+                        'FEED1','FEED2','FIELD_ID','FLAG_ROW','INTERVAL','OBSERVATION_ID','PROCESSOR_ID','SCAN_NUMBER',
+                        'STATE_ID','TIME','TIME_CENTROID','DATA','FLAG','WEIGHT_SPECTRUM']
+
+    non_default_colnames =[]
+    for colname in colnames:
+        if colname not in default_colnames:
+            non_default_colnames.append(colname)
+    if len(non_default_colnames) != 0:
+        print(f'{ms}: Non-default data columns: {", ".join(non_default_colnames)}.')
+    else:
+        print(f'{ms}: Table does only contain default columns.')
+
+    for colname in colnames:
+        if 'DATA' in colname and colname != 'DATA_DESC_ID':
+            with pt.table(ms, ack=False) as t:
+                kws = t.getcolkeywords(colname)
+                if 'LOFAR_APPLIED_BEAM_MODE' in kws:
+                    print(f'{ms}: [{colname}] Beam mode: {kws["LOFAR_APPLIED_BEAM_MODE"]} ('
+                          f'{np.degrees(kws["LOFAR_APPLIED_BEAM_DIR"]["m0"]["value"]):.4f}, '
+                          f'{np.degrees(kws["LOFAR_APPLIED_BEAM_DIR"]["m1"]["value"]):.4f}).')
+                else:
+                    print(f'{ms}: [{colname}] Beam mode: No LOFAR beam applied.')
+
+def msoverview(ms):
+    get_timestep(ms)
+    get_freq(ms)
+    get_uvw(ms)
+    #get_dir(ms)
+    get_cols(ms)
 
